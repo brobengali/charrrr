@@ -761,7 +761,8 @@ html, body {
   color: #382416;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: var(--font-serif);
@@ -770,8 +771,83 @@ html, body {
 .genre-book-item:hover {
   background: #f3e9d7;
   border-color: #baa07a;
-  transform: translateX(4px);
+  transform: translateX(3px);
   color: #1e130a;
+}
+
+.genre-book-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.genre-book-title {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.genre-book-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.genre-study-btn {
+  background: #ecdcb9;
+  border: 1px solid var(--wood-border);
+  color: #422814;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.genre-study-btn:hover {
+  background: #deca9f;
+  transform: translateY(-1px);
+}
+
+.genre-kindle-btn {
+  background: #d4a34b;
+  border: 1px solid #b3822a;
+  color: #211508;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: bold;
+  padding: 5px 11px;
+  border-radius: 12px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.genre-kindle-btn:hover {
+  background: #e2b35b;
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.affiliate-disclosure-note {
+  font-size: 11px;
+  color: #725841;
+  background: #f0e6d2;
+  border: 1px dashed #cfbca0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.4;
 }
 
 /* Wardrobe Panel */

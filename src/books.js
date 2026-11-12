@@ -14,6 +14,16 @@ const BOOK_PALETTE = [
   '#5c5346'  // Slate olive
 ];
 
+// Amazon Associates Affiliate Tag (Replace with your actual affiliate tag, e.g. 'hushhall-20')
+export const AMAZON_AFFILIATE_TAG = 'hushhall-20';
+
+// Helper to generate Amazon Kindle book affiliate purchase search link
+export function getBookAffiliateLink(bookString, affiliateTag = AMAZON_AFFILIATE_TAG) {
+  const cleanTitle = bookString.replace(/—.*$/, '').trim();
+  const query = encodeURIComponent(`${cleanTitle} kindle edition`);
+  return `https://www.amazon.com/s?k=${query}&i=digital-text&tag=${affiliateTag}`;
+}
+
 // Curated Bookshelf Genres with Curated Book Lists
 export const SHELF_GENRES = [
   // Back Wall

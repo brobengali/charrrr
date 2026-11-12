@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { playFocusChime, toggleRainSound } from './audio.js';
 import { StudySession } from './timer.js';
+import { getBookAffiliateLink } from './books.js';
 
 // Room Moods & Descriptions
 const ROOM_INFO = {
@@ -364,13 +365,36 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     if (genreBookList) {
       genreBookList.innerHTML = '';
       (genreData.books || []).forEach(bTitle => {
+        const affiliateLink = getBookAffiliateLink(bTitle);
         const li = document.createElement('li');
         li.className = 'genre-book-item';
-        li.innerHTML = `<span>📖</span> <span>${bTitle}</span>`;
-        li.addEventListener('click', () => {
+        li.innerHTML = `
+          <div class="genre-book-info">
+            <span class="genre-book-icon">📖</span>
+            <span class="genre-book-title">${bTitle}</span>
+          </div>
+          <div class="genre-book-actions">
+            <button class="genre-study-btn" title="Set this book as your active study topic">Study Here</button>
+            <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" class="genre-kindle-btn" title="Purchase Kindle ebook on Amazon to study in real life">
+              Kindle ↗
+            </a>
+          </div>
+        `;
+
+        const studyBtn = li.querySelector('.genre-study-btn');
+        studyBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
           genreModal.style.display = 'none';
           applyBookTopic(bTitle, genreData.title);
         });
+
+        // Clicking row also studies the book
+        li.addEventListener('click', (e) => {
+          if (e.target.closest('a')) return; // let affiliate link open normally
+          genreModal.style.display = 'none';
+          applyBookTopic(bTitle, genreData.title);
+        });
+
         genreBookList.appendChild(li);
       });
     }
