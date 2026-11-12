@@ -21,7 +21,7 @@ export const SHELF_GENRES = [
     id: 'bw-1',
     title: 'Economics & Markets',
     icon: '📈',
-    location: 'North Gallery · Bookcase I',
+    location: 'North Gallery · Cabinet I',
     books: [
       'The Intelligent Investor — Benjamin Graham',
       'Principles for Navigating Big Debt Crises — Ray Dalio',
@@ -33,7 +33,7 @@ export const SHELF_GENRES = [
     id: 'bw-2',
     title: 'Corporate Law & Governance',
     icon: '⚖️',
-    location: 'North Gallery · Bookcase II',
+    location: 'North Gallery · Cabinet II',
     books: [
       'The Anatomy of Corporate Law — Reinier Kraakman',
       'Mergers, Acquisitions, and Corporate Restructurings — Patrick Gaughan',
@@ -45,7 +45,7 @@ export const SHELF_GENRES = [
     id: 'bw-3',
     title: 'Business Strategy',
     icon: '♟️',
-    location: 'North Gallery · Bookcase III',
+    location: 'North Gallery · Cabinet III',
     books: [
       'Competitive Strategy: Techniques for Analyzing Industries — Michael Porter',
       'Good Strategy Bad Strategy — Richard Rumelt',
@@ -57,7 +57,7 @@ export const SHELF_GENRES = [
     id: 'bw-4',
     title: 'Venture Capital & Startups',
     icon: '🚀',
-    location: 'North Gallery · Bookcase IV',
+    location: 'North Gallery · Cabinet IV',
     books: [
       'Zero to One: Notes on Startups — Peter Thiel',
       'The Power Law: Venture Capital and the Making of the Future — Sebastian Mallaby',
@@ -69,7 +69,7 @@ export const SHELF_GENRES = [
     id: 'bw-5',
     title: 'Global Macroeconomics',
     icon: '🌐',
-    location: 'North Gallery · Bookcase V',
+    location: 'North Gallery · Cabinet V',
     books: [
       'Macroeconomics — Olivier Blanchard',
       'Lords of Finance: The Bankers Who Broke the World — Liaquat Ahamed',
@@ -81,7 +81,7 @@ export const SHELF_GENRES = [
     id: 'bw-6',
     title: 'Coffee & Gastronomy',
     icon: '☕',
-    location: 'North Gallery · Barista Reserve',
+    location: 'North Gallery · Barista Reserve Cabinet',
     books: [
       'The World Atlas of Coffee — James Hoffmann',
       'Coffee Roasting: Best Practices — Scott Rao',
@@ -95,7 +95,7 @@ export const SHELF_GENRES = [
     id: 'ww-1',
     title: 'Artificial Intelligence & ML',
     icon: '🤖',
-    location: 'West Wing · Section 1',
+    location: 'West Wing · Cabinet 1',
     books: [
       'Deep Learning — Ian Goodfellow, Yoshua Bengio, Aaron Courville',
       'Pattern Recognition and Machine Learning — Christopher Bishop',
@@ -107,7 +107,7 @@ export const SHELF_GENRES = [
     id: 'ww-2',
     title: 'Distributed Systems & Cloud',
     icon: '☁️',
-    location: 'West Wing · Section 2',
+    location: 'West Wing · Cabinet 2',
     books: [
       'Designing Data-Intensive Applications — Martin Kleppmann',
       'Site Reliability Engineering — Niall Richard Murphy et al.',
@@ -119,7 +119,7 @@ export const SHELF_GENRES = [
     id: 'ww-3',
     title: 'Algorithms & Architecture',
     icon: '💻',
-    location: 'West Wing · Section 3',
+    location: 'West Wing · Cabinet 3',
     books: [
       'Introduction to Algorithms (CLRS) — Cormen, Leiserson, Rivest, Stein',
       'Structure and Interpretation of Computer Programs — Abelson & Sussman',
@@ -131,7 +131,7 @@ export const SHELF_GENRES = [
     id: 'ww-4',
     title: 'Cybersecurity & Crypto',
     icon: '🛡️',
-    location: 'West Wing · Section 4',
+    location: 'West Wing · Cabinet 4',
     books: [
       'Applied Cryptography: Protocols and Algorithms — Bruce Schneier',
       'Serious Cryptography — Jean-Philippe Aumasson',
@@ -143,7 +143,7 @@ export const SHELF_GENRES = [
     id: 'ww-5',
     title: 'Quantum Physics & Math',
     icon: '⚛️',
-    location: 'West Wing · Section 5',
+    location: 'West Wing · Cabinet 5',
     books: [
       'The Principles of Quantum Mechanics — P.A.M. Dirac',
       'Quantum Computation and Quantum Information — Nielsen & Chuang',
@@ -155,7 +155,7 @@ export const SHELF_GENRES = [
     id: 'ww-6',
     title: 'Data Science & Statistics',
     icon: '📊',
-    location: 'West Wing · Section 6',
+    location: 'West Wing · Cabinet 6',
     books: [
       'The Elements of Statistical Learning — Hastie, Tibshirani, Friedman',
       'Bayesian Data Analysis — Andrew Gelman et al.',
@@ -169,7 +169,7 @@ export const SHELF_GENRES = [
     id: 'ew-1',
     title: 'Classic Philosophy & Logic',
     icon: '🏛️',
-    location: 'East Wing · Section 1',
+    location: 'East Wing · Cabinet 1',
     books: [
       'Meditations — Marcus Aurelius',
       'Nicomachean Ethics — Aristotle',
@@ -181,7 +181,7 @@ export const SHELF_GENRES = [
     id: 'ew-2',
     title: 'Psychology & Decision Making',
     icon: '🧠',
-    location: 'East Wing · Section 2',
+    location: 'East Wing · Cabinet 2',
     books: [
       'Thinking, Fast and Slow — Daniel Kahneman',
       'Judgment Under Uncertainty: Heuristics and Biases — Tversky & Kahneman',
@@ -193,7 +193,7 @@ export const SHELF_GENRES = [
     id: 'ew-3',
     title: 'World History & Empires',
     icon: '📜',
-    location: 'East Wing · Section 3',
+    location: 'East Wing · Cabinet 3',
     books: [
       'The Silk Roads: A New History of the World — Peter Frankopan',
       'Guns, Germs, and Steel — Jared Diamond',
@@ -205,7 +205,7 @@ export const SHELF_GENRES = [
     id: 'ew-4',
     title: 'Architecture & Design',
     icon: '📐',
-    location: 'East Wing · Section 4',
+    location: 'East Wing · Cabinet 4',
     books: [
       'A Pattern Language: Towns, Buildings, Construction — Christopher Alexander',
       'Complexity and Contradiction in Architecture — Robert Venturi',
@@ -217,7 +217,7 @@ export const SHELF_GENRES = [
     id: 'ew-5',
     title: 'Classic Literature & Poetry',
     icon: '✒️',
-    location: 'East Wing · Section 5',
+    location: 'East Wing · Cabinet 5',
     books: [
       'To the Lighthouse — Virginia Woolf',
       'The Brothers Karamazov — Fyodor Dostoevsky',
@@ -229,7 +229,7 @@ export const SHELF_GENRES = [
     id: 'ew-6',
     title: 'Biotechnology & Genomics',
     icon: '🧬',
-    location: 'East Wing · Section 6',
+    location: 'East Wing · Cabinet 6',
     books: [
       'The Gene: An Intimate History — Siddhartha Mukherjee',
       'Molecular Biology of the Cell — Bruce Alberts et al.',
@@ -243,7 +243,7 @@ export const SHELF_GENRES = [
     id: 'div-1',
     title: 'Leadership & Management',
     icon: '👔',
-    location: 'Central Aisle · West North Divider',
+    location: 'Central Aisle · West North Cabinet',
     books: [
       'High Output Management — Andrew S. Grove',
       'Turn the Ship Around! — L. David Marquet',
@@ -255,7 +255,7 @@ export const SHELF_GENRES = [
     id: 'div-2',
     title: 'Game Theory & Strategy',
     icon: '🎲',
-    location: 'Central Aisle · East North Divider',
+    location: 'Central Aisle · East North Cabinet',
     books: [
       'Theory of Games and Economic Behavior — John von Neumann & Oskar Morgenstern',
       'Thinking Strategically: The Competitive Edge — Dixit & Nalebuff',
@@ -267,7 +267,7 @@ export const SHELF_GENRES = [
     id: 'div-3',
     title: 'Cognitive Science & Mind',
     icon: '🔬',
-    location: 'Central Aisle · West South Divider',
+    location: 'Central Aisle · West South Cabinet',
     books: [
       'Gödel, Escher, Bach: An Eternal Golden Braid — Douglas Hofstadter',
       'The Master and His Emissary — Iain McGilchrist',
@@ -279,7 +279,7 @@ export const SHELF_GENRES = [
     id: 'div-4',
     title: 'Political Economy',
     icon: '🏛️',
-    location: 'Central Aisle · East South Divider',
+    location: 'Central Aisle · East South Cabinet',
     books: [
       'The Wealth of Nations — Adam Smith',
       'Why Nations Fail: The Origins of Power, Prosperity, and Poverty — Acemoglu & Robinson',
@@ -298,33 +298,68 @@ function createPRNG(seed = 12345) {
   };
 }
 
-// Helper: Create a crisp canvas texture for the genre plaque
-function createGenreCanvasTexture(title, icon = '✦') {
+// Helper: Create a prominent canvas texture written CLEARLY & BIG directly onto the glass pane
+function createGlassGenreCanvasTexture(title, icon = '✦') {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 96;
+  canvas.width = 1024;
+  canvas.height = 384;
   const ctx = canvas.getContext('2d');
 
-  // Background Dark Walnut / Bronze Plaque
-  ctx.fillStyle = '#1e140d';
-  ctx.fillRect(0, 0, 512, 96);
+  // Clear transparent background so books inside the cabinet remain visible
+  ctx.clearRect(0, 0, 1024, 384);
 
-  // Outer Gold Border
-  ctx.strokeStyle = '#cda250';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(6, 6, 500, 84);
+  // Semi-translucent frosted glass backing plate for high contrast
+  ctx.fillStyle = 'rgba(24, 16, 10, 0.58)';
+  if (ctx.roundRect) {
+    ctx.roundRect(32, 40, 960, 304, 28);
+    ctx.fill();
+  } else {
+    ctx.fillRect(32, 40, 960, 304);
+  }
 
-  // Inner Fine Gold Inset
-  ctx.strokeStyle = '#856428';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(12, 12, 488, 72);
+  // Double Gilded Gold Filigree Border on the Glass
+  ctx.strokeStyle = 'rgba(218, 172, 80, 0.95)';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(44, 52, 936, 280);
 
-  // Text with serif elegance
-  ctx.fillStyle = '#faeedb';
-  ctx.font = 'bold 24px Georgia, serif';
+  ctx.strokeStyle = 'rgba(168, 126, 45, 0.8)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(56, 64, 912, 256);
+
+  // Four Gold Corner Rosettes
+  const corners = [
+    [56, 64], [968, 64], [56, 320], [968, 320]
+  ];
+  corners.forEach(([cx, cy]) => {
+    ctx.fillStyle = '#ffdf85';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Top Badge: LOCKED RESERVE ARCHIVE
+  ctx.fillStyle = '#f0d2a8';
+  ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`${icon}  ${title.toUpperCase()}  ${icon}`, 256, 48);
+  ctx.fillText('🔒 LOCKED RESERVE · CURATED ARCHIVE', 512, 106);
+
+  // MAIN CLEAR BIG NAME WRITTEN ON GLASS
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 54px Georgia, "Times New Roman", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 4;
+  ctx.fillText(title.toUpperCase(), 512, 192);
+
+  // Reset shadow for bottom subline
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#dfb564';
+  ctx.font = '20px Georgia, serif';
+  ctx.fillText(`— ${icon} AUTHORIZED FACULTY VOLUMES ${icon} —`, 512, 268);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -332,37 +367,49 @@ function createGenreCanvasTexture(title, icon = '✦') {
 }
 
 export function buildBookshelves(scene) {
+  // Rich Walnut Wood for Cabinet Frame
   const shelfWoodMat = new THREE.MeshStandardMaterial({
-    color: '#462b18',
-    roughness: 0.82,
+    color: '#422714',
+    roughness: 0.8,
     metalness: 0.05,
     flatShading: true
   });
 
   const shelfBackMat = new THREE.MeshStandardMaterial({
-    color: '#301c10',
-    roughness: 0.9,
-    metalness: 0.05,
+    color: '#2a170d',
+    roughness: 0.92,
+    metalness: 0.04,
     flatShading: true
   });
 
-  const brassPlaqueBorderMat = new THREE.MeshStandardMaterial({
-    color: '#cda250',
-    roughness: 0.35,
-    metalness: 0.75,
+  // Polished Brass for Escutcheon Locks, Hinges & Handles
+  const brassLockMat = new THREE.MeshStandardMaterial({
+    color: '#deb358',
+    roughness: 0.3,
+    metalness: 0.85,
+    flatShading: true
+  });
+
+  // Clear Translucent Glass Pane Material (Books visible inside)
+  const cabinetGlassMat = new THREE.MeshStandardMaterial({
+    color: '#cde4f7',
+    roughness: 0.1,
+    metalness: 0.15,
+    transparent: true,
+    opacity: 0.42,
     flatShading: true
   });
 
   const bookSlots = [];
   const shelfClickables = [];
 
-  // Helper to build a single standalone wooden bookshelf unit with an attached Genre Plaque
+  // Helper to build a Glass-Enclosed Locked Bookshelf Cabinet with Big Name on Glass
   function createShelfUnit(genreObj, x, y, z, rotY, width, height, depth, numShelves, doubleSided = false) {
     const group = new THREE.Group();
     group.position.set(x, y, z);
     group.rotation.y = rotY;
 
-    // 1. Back panel (only if not open double-sided partition)
+    // 1. Back panel
     if (!doubleSided) {
       const back = new THREE.Mesh(
         new THREE.BoxGeometry(width, height, 0.04),
@@ -389,53 +436,31 @@ export function buildBookshelves(scene) {
 
     // 3. Top crown and bottom base plinth
     const plinth = new THREE.Mesh(
-      new THREE.BoxGeometry(width + 0.04, 0.14, depth + 0.04),
+      new THREE.BoxGeometry(width + 0.04, 0.16, depth + 0.06),
       shelfWoodMat
     );
-    plinth.position.set(0, 0.07, 0);
+    plinth.position.set(0, 0.08, 0.01);
     plinth.castShadow = true;
     group.add(plinth);
 
-    const crownHeight = 0.28;
+    const crownHeight = 0.26;
     const crown = new THREE.Mesh(
       new THREE.BoxGeometry(width + 0.08, crownHeight, depth + 0.08),
       shelfWoodMat
     );
-    crown.position.set(0, height - crownHeight / 2, 0);
+    crown.position.set(0, height - crownHeight / 2, 0.02);
     crown.castShadow = true;
     group.add(crown);
 
-    // 4. ATTACH GENRE PLAQUE TO BOOK RACK
-    const plaqueWidth = Math.min(width - 0.2, 2.2);
-    const plaqueHeight = 0.22;
-    const plaqueDepth = 0.03;
-
-    // Brass Plaque Frame / Rim
-    const plaqueFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(plaqueWidth + 0.04, plaqueHeight + 0.04, plaqueDepth),
-      brassPlaqueBorderMat
-    );
-    plaqueFrame.position.set(0, height - crownHeight / 2, depth / 2 + 0.045);
-    group.add(plaqueFrame);
-
-    // Plaque Face with Crisp Genre Name Canvas Texture
-    const genreTexture = createGenreCanvasTexture(genreObj.title, genreObj.icon);
-    const plaqueFaceMat = new THREE.MeshBasicMaterial({ map: genreTexture });
-    const plaqueFace = new THREE.Mesh(
-      new THREE.PlaneGeometry(plaqueWidth, plaqueHeight),
-      plaqueFaceMat
-    );
-    plaqueFace.position.set(0, height - crownHeight / 2, depth / 2 + 0.062);
-    group.add(plaqueFace);
-
-    // 5. Horizontal Shelves & Book Slot Locations
-    const shelfSpacing = (height - crownHeight - 0.2) / numShelves;
-    const shelfGeo = new THREE.BoxGeometry(width - 0.08, 0.04, depth - 0.02);
+    // 4. Horizontal Shelves & Book Slot Locations Inside Cabinet
+    const doorHeight = height - crownHeight - 0.16;
+    const shelfSpacing = (doorHeight - 0.1) / numShelves;
+    const shelfGeo = new THREE.BoxGeometry(width - 0.08, 0.04, depth - 0.06);
 
     for (let i = 0; i < numShelves; i++) {
       const shelfY = 0.18 + (i * shelfSpacing);
       const shelf = new THREE.Mesh(shelfGeo, shelfWoodMat);
-      shelf.position.set(0, shelfY, 0);
+      shelf.position.set(0, shelfY, -0.02);
       shelf.castShadow = true;
       shelf.receiveShadow = true;
       group.add(shelf);
@@ -443,21 +468,106 @@ export function buildBookshelves(scene) {
       bookSlots.push({
         origin: new THREE.Vector3(x, y + shelfY + 0.02, z),
         rotY,
-        width: width - 0.2,
-        depth: depth - 0.1,
+        width: width - 0.22,
+        depth: depth - 0.14,
         maxHeight: shelfSpacing - 0.08,
         seed: Math.abs(Math.round(x * 123 + z * 77 + i * 31)) + 1
       });
     }
 
-    // 6. Raycast Hitbox for Clicking/Hovering this Shelf to Browse Genre
+    // 5. LOCKED GLASS CABINET ENCLOSURE (Front of the shelf unit)
+    const glassZ = depth / 2 + 0.01;
+    const doorCenterY = 0.16 + doorHeight / 2;
+
+    // Outer Wooden Door Frame Trim
+    // Left & Right Stiles
+    [-width / 2 + 0.04, width / 2 - 0.04].forEach(fx => {
+      const stile = new THREE.Mesh(new THREE.BoxGeometry(0.06, doorHeight, 0.04), shelfWoodMat);
+      stile.position.set(fx, doorCenterY, glassZ);
+      group.add(stile);
+    });
+
+    // Center Vertical Meeting Astragal (Seam between two doors)
+    const centerAstragal = new THREE.Mesh(new THREE.BoxGeometry(0.05, doorHeight, 0.045), shelfWoodMat);
+    centerAstragal.position.set(0, doorCenterY, glassZ);
+    group.add(centerAstragal);
+
+    // Top & Bottom Door Rails
+    const topRail = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, 0.06, 0.04), shelfWoodMat);
+    topRail.position.set(0, 0.16 + doorHeight - 0.03, glassZ);
+    group.add(topRail);
+
+    const bottomRail = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, 0.06, 0.04), shelfWoodMat);
+    bottomRail.position.set(0, 0.16 + 0.03, glassZ);
+    group.add(bottomRail);
+
+    // Two Clear Glass Panes (Left Door & Right Door)
+    const singlePaneW = (width - 0.24) / 2;
+    const paneH = doorHeight - 0.08;
+
+    [-singlePaneW / 2 - 0.03, singlePaneW / 2 + 0.03].forEach(px => {
+      const glassPane = new THREE.Mesh(new THREE.PlaneGeometry(singlePaneW, paneH), cabinetGlassMat);
+      glassPane.position.set(px, doorCenterY, glassZ + 0.005);
+      group.add(glassPane);
+    });
+
+    // 6. POLISHED BRASS LOCK & CABINET HANDLES (Showing it is locked!)
+    const lockY = doorCenterY - 0.15;
+
+    // Brass Lock Escutcheon Plate at center seam
+    const escutcheon = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.018, 12), brassLockMat);
+    escutcheon.rotation.x = Math.PI / 2;
+    escutcheon.position.set(0, lockY, glassZ + 0.026);
+    group.add(escutcheon);
+
+    // Keyhole Slot (Dark cutout)
+    const keyhole = new THREE.Mesh(
+      new THREE.BoxGeometry(0.012, 0.032, 0.01),
+      new THREE.MeshBasicMaterial({ color: '#100c08' })
+    );
+    keyhole.position.set(0, lockY, glassZ + 0.036);
+    group.add(keyhole);
+
+    // Dual Brass Handles / Teardrop Pulls on Left & Right Doors
+    [-0.065, 0.065].forEach(hx => {
+      const handleStem = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.03, 6), brassLockMat);
+      handleStem.rotation.x = Math.PI / 2;
+      handleStem.position.set(hx, lockY, glassZ + 0.03);
+      group.add(handleStem);
+
+      const handleRing = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.006, 6, 12), brassLockMat);
+      handleRing.position.set(hx, lockY - 0.025, glassZ + 0.045);
+      group.add(handleRing);
+    });
+
+    // 7. CLEAR BIG NAME WRITTEN DIRECTLY ON THE GLASS
+    const namePlaneW = Math.min(width - 0.22, 2.7);
+    const namePlaneH = 0.98;
+    const nameY = height * 0.62;
+
+    const glassDecalTexture = createGlassGenreCanvasTexture(genreObj.title, genreObj.icon);
+    const glassDecalMat = new THREE.MeshBasicMaterial({
+      map: glassDecalTexture,
+      transparent: true,
+      opacity: 0.96
+    });
+
+    const glassNamePlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(namePlaneW, namePlaneH),
+      glassDecalMat
+    );
+    glassNamePlane.position.set(0, nameY, glassZ + 0.018);
+    group.add(glassNamePlane);
+
+    // 8. Raycast Hitbox for Clicking/Hovering this Locked Shelf
     const hitBox = new THREE.Mesh(
       new THREE.BoxGeometry(width + 0.2, height, depth + 0.6),
       new THREE.MeshBasicMaterial({ visible: false })
     );
-    hitBox.position.set(0, height / 2, 0.2);
+    hitBox.position.set(0, height / 2, 0.25);
     hitBox.userData = {
       isShelf: true,
+      isLocked: true,
       genreData: genreObj
     };
     shelfClickables.push(hitBox);
@@ -466,7 +576,7 @@ export function buildBookshelves(scene) {
     scene.add(group);
   }
 
-  // BUILD ALL 22 GENRE BOOKCASES:
+  // BUILD ALL 22 LOCKED GLASS BOOKCASES:
 
   // 1. Back Wall Bookshelves (6 Shelf Units)
   createShelfUnit(SHELF_GENRES[0], -16.4, 0, -14.6, 0, 3.0, 5.0, 0.52, 7);
@@ -498,7 +608,7 @@ export function buildBookshelves(scene) {
   createShelfUnit(SHELF_GENRES[20], -8.6, 0, 12.8, 0, 3.2, 2.6, 0.5, 4);
   createShelfUnit(SHELF_GENRES[21], 8.6, 0, 12.8, 0, 3.2, 2.6, 0.5, 4);
 
-  // 5. Populate Thousands of Procedural Books using THREE.InstancedMesh
+  // 5. Populate Thousands of Procedural Books Visible Behind the Glass
   const totalEstimatedBooks = 2400;
   const bookGeo = new THREE.BoxGeometry(1, 1, 1);
   const bookMat = new THREE.MeshStandardMaterial({

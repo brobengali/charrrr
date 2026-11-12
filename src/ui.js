@@ -259,7 +259,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
         session.mySeat = null;
         currentTopicLabel.textContent = 'None (Pick a chair to sit)';
         btnStandUp.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
       }
     });
   }
@@ -305,7 +305,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
       } else {
         controls.startWalkMode();
         btnWalk.textContent = 'Exit walk';
@@ -320,7 +320,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
       }
     };
   }
