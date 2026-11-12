@@ -4,10 +4,10 @@ import { StudySession } from './timer.js';
 
 // Room Moods & Descriptions
 const ROOM_INFO = {
-  'main-reading': { name: 'Main Reading Hall', mood: 'Big, quiet, long tables' },
-  'science-wing': { name: 'Science Wing', mood: 'Labs, papers, problem sets' },
-  'exam-season': { name: 'Exam Season Hall', mood: 'Deadlines and steady pages' },
-  'night-owls': { name: 'Night Owls Hall', mood: 'Late-night lamps' }
+  'main-reading': { name: 'Grand Study Cafe', mood: '56 tables · face-to-face seating · formal focus' },
+  'science-wing': { name: 'Executive Work Lounge', mood: 'Quiet analysis · coffee roasts · strategy decks' },
+  'exam-season': { name: 'High-Focus Library Cafe', mood: 'Deadlines · deep problem sets · quiet laptops' },
+  'night-owls': { name: 'Midnight Espresso Hall', mood: 'Late-night steam · dim lamps · calm focus' }
 };
 
 export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
@@ -23,14 +23,31 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     }
   });
 
-  const SHIRT_COLORS = [
-    '#4f7a5a', '#3f5a8a', '#b9862f', '#8a4a3a',
-    '#7a6aa8', '#c07a4a', '#3a3f4a', '#d6b885'
+  // Formal Office Attire Palette
+  const SUIT_COLORS = [
+    '#1e2838', // Midnight Navy
+    '#2a2e36', // Charcoal Grey
+    '#161c24', // Deep Onyx
+    '#383f4a', // Slate Steel
+    '#443328', // Tweed Espresso
+    '#3c2226'  // Burgundy Wool
+  ];
+
+  const TIE_COLORS = [
+    '#8a2420', // Crimson Silk
+    '#1e385c', // Royal Navy
+    '#a07c2e', // Gold Stripe
+    '#224835', // British Racing Green
+    '#2c3038'  // Classic Charcoal
   ];
 
   const HAIR_COLORS = [
-    '#1a100b', '#2b1b11', '#472b17',
-    '#6e4125', '#8f5c32', '#cca568'
+    '#120d09', // Jet Black
+    '#1c1510', // Dark Espresso
+    '#352418', // Chestnut Brown
+    '#542b1a', // Auburn
+    '#a38c6d', // Ash Blonde
+    '#6a6d75'  // Distinguished Silver
   ];
 
   // DOM Elements
@@ -65,12 +82,14 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
 
   const topicModal = document.getElementById('topic-modal');
   const topicName = document.getElementById('topic-name');
+  const topicRole = document.getElementById('topic-role');
   const topicAvatar = document.getElementById('topic-avatar');
   const topicSeat = document.getElementById('topic-seat');
   const topicText = document.getElementById('topic-text');
 
   const wardrobeModal = document.getElementById('wardrobe-modal');
-  const shirtSwatches = document.getElementById('shirt-swatches');
+  const suitSwatches = document.getElementById('suit-swatches');
+  const tieSwatches = document.getElementById('tie-swatches');
   const hairSwatches = document.getElementById('hair-swatches');
 
   const notesModal = document.getElementById('notes-modal');
@@ -92,7 +111,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
       const info = ROOM_INFO[selectedRoom] || ROOM_INFO['main-reading'];
       if (roomMood) roomMood.textContent = info.mood;
       render2DFloorGrid();
-      hintPill.textContent = `Moved to ${info.name} · Pick a desk to study`;
+      hintPill.textContent = `Moved to ${info.name} · Choose any free chair to sit`;
     });
   }
 
@@ -122,47 +141,63 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     });
   }
 
-  // 4. Render 2D Simple Floor Grid
+  // 4. Render 2D Simple Floor Grid (56 Tables, 112 Seats)
   function render2DFloorGrid() {
     if (!desksGrid2D) return;
     desksGrid2D.innerHTML = '';
 
-    furnitureAPI.desksData.forEach(desk => {
-      const cell = document.createElement('div');
-      cell.className = `desk-cell-2d ${desk.config.occupied ? 'occupied' : 'vacant'}`;
-
-      let studentHtml = '';
-      if (desk.config.occupied && desk.studentData) {
-        studentHtml = `
-          <div class="desk-cell-student">${desk.studentData.avatar || '📖'} ${desk.studentData.name}</div>
-          <div class="desk-cell-topic">${desk.studentData.topic || 'Quiet Study'}</div>
-        `;
-      } else {
-        studentHtml = `<div class="desk-cell-topic" style="color: #4f7a5a; font-weight:600;">Vacant · Tap to sit</div>`;
+    // Group seats by tableId
+    const tablesMap = new Map();
+    furnitureAPI.desksData.forEach(seat => {
+      if (!tablesMap.has(seat.tableId)) {
+        tablesMap.set(seat.tableId, []);
       }
+      tablesMap.get(seat.tableId).push(seat);
+    });
 
-      cell.innerHTML = `
-        <div class="desk-cell-id">Desk ${desk.id}</div>
-        <div class="desk-cell-status">${desk.config.occupied ? 'Occupied' : 'Available'}</div>
-        ${studentHtml}
+    tablesMap.forEach((seats, tId) => {
+      const tableCard = document.createElement('div');
+      tableCard.className = 'table-card-2d';
+
+      const northSeat = seats.find(s => s.side === 'N') || seats[0];
+      const southSeat = seats.find(s => s.side === 'S') || seats[1];
+
+      tableCard.innerHTML = `
+        <div class="table-card-header">Table ${tId}</div>
+        <div class="table-seats-row">
+          <div class="seat-badge-2d ${northSeat.occupied ? 'occupied' : 'vacant'}" data-seat="${northSeat.id}">
+            <b>North Chair:</b> ${northSeat.occupied ? (northSeat.studentData?.name || 'Occupied') : 'Vacant · Sit'}
+          </div>
+          <div class="seat-badge-2d ${southSeat.occupied ? 'occupied' : 'vacant'}" data-seat="${southSeat.id}">
+            <b>South Chair:</b> ${southSeat.occupied ? (southSeat.studentData?.name || 'Occupied') : 'Vacant · Sit'}
+          </div>
+        </div>
       `;
 
-      cell.addEventListener('click', () => {
-        if (desk.config.occupied) {
-          showTopicModal(desk.studentData, desk.id);
-        } else {
-          openSitModal(desk.id);
-        }
+      // Click listener for each seat in 2D
+      tableCard.querySelectorAll('[data-seat]').forEach(seatEl => {
+        seatEl.addEventListener('click', () => {
+          const sId = seatEl.getAttribute('data-seat');
+          const seatObj = furnitureAPI.desksData.find(s => s.id === sId);
+          if (seatObj) {
+            if (seatObj.occupied) {
+              showTopicModal(seatObj.studentData, seatObj.id, seatObj.tableId, seatObj.side);
+            } else {
+              openSitModal(seatObj.id, seatObj.tableId, seatObj.side);
+            }
+          }
+        });
       });
 
-      desksGrid2D.appendChild(cell);
+      desksGrid2D.appendChild(tableCard);
     });
   }
 
   // 5. Sit at Desk Flow
-  function openSitModal(seatId) {
+  function openSitModal(seatId, tableId = '', side = '') {
     selectedSeatForSit = seatId;
-    sitModalTitle.textContent = `Take Desk ${seatId}`;
+    const sideName = side === 'N' ? 'North Chair (Facing South)' : 'South Chair (Facing North)';
+    sitModalTitle.textContent = `Take Seat ${seatId} (${sideName})`;
     inputStudyTopic.value = session.myTopic || '';
     sitModal.style.display = 'flex';
     inputStudyTopic.focus();
@@ -170,36 +205,36 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
 
   if (btnConfirmSit) {
     btnConfirmSit.addEventListener('click', () => {
-      const topic = inputStudyTopic.value.trim() || 'Deep Focus Study Session';
+      const topic = inputStudyTopic.value.trim() || 'Personal Deep Focus & Strategy Review';
       sitModal.style.display = 'none';
 
       if (selectedSeatForSit) {
         const success = furnitureAPI.sitPlayerAtDesk(
           selectedSeatForSit,
-          session.profile.shirtColor,
-          session.profile.hairColor
+          session.profile.suitColor || '#1e2838',
+          session.profile.hairColor || '#1c1510',
+          session.profile.tieColor || '#8a2420'
         );
 
         if (success) {
           session.mySeat = selectedSeatForSit;
           session.startFocus(topic);
-          currentTopicLabel.textContent = `${topic} (Desk ${selectedSeatForSit})`;
-          hintPill.textContent = `Sitting at Desk ${selectedSeatForSit} · Studying: ${topic}`;
+          currentTopicLabel.textContent = `${topic} (${selectedSeatForSit})`;
+          hintPill.textContent = `Sitting at ${selectedSeatForSit} · Project: ${topic}`;
           btnStandUp.style.display = 'inline-block';
 
-          // Animate Orbit camera towards user's desk
-          const desk = furnitureAPI.desksData.find(d => d.id === selectedSeatForSit);
-          if (desk) {
+          // Animate Orbit camera towards user's chair
+          const seatObj = furnitureAPI.desksData.find(d => d.id === selectedSeatForSit);
+          if (seatObj) {
             const target = new THREE.Vector3(
-              desk.config.x,
+              seatObj.tx,
               1.1,
-              desk.config.z + 1.8 * desk.config.facing
+              seatObj.tz
             );
             controls.orbit.target.lerp(target, 0.7);
             controls.orbit.update();
           }
 
-          // If in 2D floor view, switch back to 3D to see your seated avatar
           if (currentView === '2d') {
             currentView = '3d';
             floor2D.style.display = 'none';
@@ -216,9 +251,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
       if (session.mySeat) {
         session.reset();
         session.mySeat = null;
-        currentTopicLabel.textContent = 'None (Pick a desk to sit)';
+        currentTopicLabel.textContent = 'None (Pick a chair to sit)';
         btnStandUp.style.display = 'none';
-        hintPill.textContent = "Tap a free desk to sit, or someone's desk to see their topic.";
+        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
       }
     });
   }
@@ -227,11 +262,11 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
   if (btnTimerAction) {
     btnTimerAction.addEventListener('click', () => {
       if (session.phase === 'idle') {
-        session.startFocus(session.myTopic || 'General Study');
+        session.startFocus(session.myTopic || 'General Deep Work');
       } else if (session.phase === 'focus') {
         session.startBreak();
       } else {
-        session.startFocus(session.myTopic || 'General Study');
+        session.startFocus(session.myTopic || 'General Deep Work');
       }
     });
   }
@@ -245,10 +280,10 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
   function updateFocusBarState() {
     updateTimerDisplay();
     if (session.phase === 'focus') {
-      btnTimerAction.textContent = 'Take break';
+      btnTimerAction.textContent = 'Take coffee break';
       btnTimerAction.className = 'focus-btn primary-action';
     } else if (session.phase === 'break') {
-      btnTimerAction.textContent = 'Back to focus';
+      btnTimerAction.textContent = 'Back to work';
       btnTimerAction.className = 'focus-btn';
     } else {
       btnTimerAction.textContent = 'Start focus';
@@ -264,13 +299,13 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap a free desk to sit, or someone's desk to see their topic.";
+        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
       } else {
         controls.startWalkMode();
         btnWalk.textContent = 'Exit walk';
         btnWalk.classList.add('active');
         crosshair.style.display = 'block';
-        hintPill.textContent = 'WASD / Arrows to walk · Shift to sprint · Move mouse to look around · Esc to exit';
+        hintPill.textContent = 'WASD / Arrows to stroll cafe aisles · Shift to sprint · Esc to exit';
       }
     });
 
@@ -279,7 +314,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap a free desk to sit, or someone's desk to see their topic.";
+        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
       }
     };
   }
@@ -299,22 +334,25 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
   if (btnZoomIn) btnZoomIn.addEventListener('click', () => controls.zoomIn());
   if (btnZoomOut) btnZoomOut.addEventListener('click', () => controls.zoomOut());
 
-  // 11. Study Topic Modal
-  function showTopicModal(studentData, seatId) {
-    if (!studentData) return;
-    topicName.textContent = studentData.name;
-    topicAvatar.textContent = studentData.avatar || '📖';
-    topicSeat.textContent = `Desk ${seatId}`;
-    topicText.textContent = studentData.topic || 'Studying in quiet focus';
+  // 11. Colleague Topic Modal
+  function showTopicModal(colleagueData, seatId, tableId = '', side = '') {
+    if (!colleagueData) return;
+    topicName.textContent = colleagueData.name;
+    if (topicRole) topicRole.textContent = colleagueData.role || 'Executive Member';
+    topicAvatar.textContent = colleagueData.avatar || '💼';
+    const sideDesc = side === 'N' ? 'North Chair' : (side === 'S' ? 'South Chair' : '');
+    topicSeat.textContent = `${seatId} ${sideDesc ? '· ' + sideDesc : ''}`;
+    topicText.textContent = colleagueData.topic || 'Reviewing strategic company initiatives';
     topicModal.style.display = 'flex';
   }
 
-  // 12. Wardrobe Modal
+  // 12. Wardrobe Modal (Formal Office Attire)
   function buildSwatches(container, colors, selectedColor, onSelect) {
+    if (!container) return;
     container.innerHTML = '';
     colors.forEach(hex => {
       const swatch = document.createElement('div');
-      swatch.className = `color-swatch ${hex.toLowerCase() === selectedColor.toLowerCase() ? 'selected' : ''}`;
+      swatch.className = `color-swatch ${hex.toLowerCase() === (selectedColor || '').toLowerCase() ? 'selected' : ''}`;
       swatch.style.backgroundColor = hex;
       swatch.addEventListener('click', () => {
         container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
@@ -327,32 +365,20 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
 
   if (btnWardrobe) {
     btnWardrobe.addEventListener('click', () => {
-      buildSwatches(shirtSwatches, SHIRT_COLORS, session.profile.shirtColor, color => {
-        session.saveProfile({ shirtColor: color });
-        updatePlayerLook();
+      buildSwatches(suitSwatches, SUIT_COLORS, session.profile.suitColor || '#1e2838', color => {
+        session.saveProfile({ suitColor: color });
       });
 
-      buildSwatches(hairSwatches, HAIR_COLORS, session.profile.hairColor, color => {
+      buildSwatches(tieSwatches, TIE_COLORS, session.profile.tieColor || '#8a2420', color => {
+        session.saveProfile({ tieColor: color });
+      });
+
+      buildSwatches(hairSwatches, HAIR_COLORS, session.profile.hairColor || '#1c1510', color => {
         session.saveProfile({ hairColor: color });
-        updatePlayerLook();
       });
 
       wardrobeModal.style.display = 'flex';
     });
-  }
-
-  function updatePlayerLook() {
-    if (session.mySeat) {
-      const desk = furnitureAPI.desksData.find(d => d.id === session.mySeat);
-      if (desk && desk.avatarGroup && desk.avatarGroup.userData) {
-        if (desk.avatarGroup.userData.shirtMat) {
-          desk.avatarGroup.userData.shirtMat.color.set(session.profile.shirtColor);
-        }
-        if (desk.avatarGroup.userData.hairMat) {
-          desk.avatarGroup.userData.hairMat.color.set(session.profile.hairColor);
-        }
-      }
-    }
   }
 
   // 13. Notes Modal
@@ -367,7 +393,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     btnSaveNotes.addEventListener('click', () => {
       session.saveNotes(notesTextarea.value);
       notesModal.style.display = 'none';
-      hintPill.textContent = 'Notes saved to your browser.';
+      hintPill.textContent = 'Executive notes saved to your browser.';
     });
   }
 
@@ -387,7 +413,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
           </div>
         `).join('');
       } else {
-        hoursLogList.innerHTML = '<div class="empty-state">No sessions logged yet. Complete a 25-minute focus session to log hours!</div>';
+        hoursLogList.innerHTML = '<div class="empty-state">No sessions logged yet. Complete a 25-minute focus round to log hours!</div>';
       }
 
       hoursModal.style.display = 'flex';
@@ -428,9 +454,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
       const data = hit.userData;
 
       if (data.occupied) {
-        showTopicModal(data.studentData, data.seatId);
+        showTopicModal(data.studentData, data.seatId, data.tableId, data.side);
       } else {
-        openSitModal(data.seatId);
+        openSitModal(data.seatId, data.tableId, data.side);
       }
     }
   });

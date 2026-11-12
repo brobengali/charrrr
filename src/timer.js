@@ -29,10 +29,12 @@ export class StudySession {
       if (data) return JSON.parse(data);
     } catch (e) {}
     const defaultProfile = {
-      name: 'Reader',
-      avatar: '📖',
-      shirtColor: '#4f7a5a',
-      hairColor: '#2b1b11'
+      name: 'Executive Member',
+      avatar: '💼',
+      suitColor: '#1e2838',
+      tieColor: '#8a2420',
+      shirtColor: '#ffffff',
+      hairColor: '#1c1510'
     };
     this.saveProfile(defaultProfile);
     return defaultProfile;
@@ -143,3 +145,4 @@ export class StudySession {
     } catch (e) {}
   }
 }
+

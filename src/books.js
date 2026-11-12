@@ -9,7 +9,9 @@ const BOOK_PALETTE = [
   '#613d22', // Warm brown
   '#84392a', // Rust red
   '#3a483a', // Sage dark
-  '#3d3126'  // Espresso
+  '#3d3126', // Espresso
+  '#4a3b59', // Muted plum
+  '#5c5346'  // Slate olive
 ];
 
 // Helper: Seeded pseudo-random generator
@@ -30,7 +32,7 @@ export function buildBookshelves(scene) {
   });
 
   const shelfBackMat = new THREE.MeshStandardMaterial({
-    color: '#341f12',
+    color: '#301c10',
     roughness: 0.9,
     metalness: 0.05,
     flatShading: true
@@ -40,19 +42,21 @@ export function buildBookshelves(scene) {
   const bookSlots = [];
 
   // Helper to build a single standalone wooden bookshelf unit
-  function createShelfUnit(x, y, z, rotY, width, height, depth, numShelves) {
+  function createShelfUnit(x, y, z, rotY, width, height, depth, numShelves, doubleSided = false) {
     const group = new THREE.Group();
     group.position.set(x, y, z);
     group.rotation.y = rotY;
 
-    // 1. Back panel
-    const back = new THREE.Mesh(
-      new THREE.BoxGeometry(width, height, 0.04),
-      shelfBackMat
-    );
-    back.position.set(0, height / 2, -depth / 2 + 0.02);
-    back.receiveShadow = true;
-    group.add(back);
+    // 1. Back panel (only if not open double-sided partition)
+    if (!doubleSided) {
+      const back = new THREE.Mesh(
+        new THREE.BoxGeometry(width, height, 0.04),
+        shelfBackMat
+      );
+      back.position.set(0, height / 2, -depth / 2 + 0.02);
+      back.receiveShadow = true;
+      group.add(back);
+    }
 
     // 2. Left & Right uprights
     const uprightGeo = new THREE.BoxGeometry(0.08, height, depth);
@@ -70,27 +74,27 @@ export function buildBookshelves(scene) {
 
     // 3. Top crown and bottom base plinth
     const plinth = new THREE.Mesh(
-      new THREE.BoxGeometry(width, 0.12, depth + 0.04),
+      new THREE.BoxGeometry(width + 0.04, 0.14, depth + 0.04),
       shelfWoodMat
     );
-    plinth.position.set(0, 0.06, 0.02);
+    plinth.position.set(0, 0.07, 0);
     plinth.castShadow = true;
     group.add(plinth);
 
     const crown = new THREE.Mesh(
-      new THREE.BoxGeometry(width + 0.08, 0.14, depth + 0.06),
+      new THREE.BoxGeometry(width + 0.08, 0.16, depth + 0.08),
       shelfWoodMat
     );
-    crown.position.set(0, height - 0.07, 0.03);
+    crown.position.set(0, height - 0.08, 0);
     crown.castShadow = true;
     group.add(crown);
 
     // 4. Horizontal Shelves & Book Slot Locations
-    const shelfSpacing = (height - 0.3) / numShelves;
+    const shelfSpacing = (height - 0.32) / numShelves;
     const shelfGeo = new THREE.BoxGeometry(width - 0.08, 0.04, depth - 0.02);
 
     for (let i = 0; i < numShelves; i++) {
-      const shelfY = 0.15 + (i * shelfSpacing);
+      const shelfY = 0.18 + (i * shelfSpacing);
       const shelf = new THREE.Mesh(shelfGeo, shelfWoodMat);
       shelf.position.set(0, shelfY, 0);
       shelf.castShadow = true;
@@ -101,32 +105,54 @@ export function buildBookshelves(scene) {
       bookSlots.push({
         origin: new THREE.Vector3(x, y + shelfY + 0.02, z),
         rotY,
-        width: width - 0.22,
+        width: width - 0.2,
         depth: depth - 0.1,
         maxHeight: shelfSpacing - 0.08,
-        seed: Math.abs(Math.round(x * 100 + z * 50 + i * 17)) + 1
+        seed: Math.abs(Math.round(x * 123 + z * 77 + i * 31)) + 1
       });
     }
 
     scene.add(group);
   }
 
-  // 1. Back Wall Bookshelves (Lining both sides of the 3 central windows)
-  // Back Wall is at Z = -7.3
-  createShelfUnit(-8.2, 0, -7.1, 0, 3.2, 4.4, 0.5, 6);
-  createShelfUnit(-4.6, 0, -7.1, 0, 2.2, 4.4, 0.5, 6);
-  createShelfUnit(4.6, 0, -7.1, 0, 2.2, 4.4, 0.5, 6);
-  createShelfUnit(8.2, 0, -7.1, 0, 3.2, 4.4, 0.5, 6);
+  // MULTIPLE BOOKSHELVES:
 
-  // 2. Left Wall Bookshelves (Lining the West wall)
-  // Left Wall is at X = -10.3, facing into the room (+90 deg)
-  createShelfUnit(-10.1, 0, -4.8, Math.PI / 2, 3.2, 4.4, 0.5, 6);
-  createShelfUnit(-10.1, 0, -1.2, Math.PI / 2, 3.2, 4.4, 0.5, 6);
-  createShelfUnit(-10.1, 0, 2.4, Math.PI / 2, 3.2, 4.4, 0.5, 6);
-  createShelfUnit(-10.1, 0, 5.8, Math.PI / 2, 3.0, 4.4, 0.5, 6);
+  // 1. Back Wall Bookshelves (Left & Right flanking windows and barista counter)
+  // Back Wall is at Z = -14.6
+  createShelfUnit(-16.4, 0, -14.6, 0, 3.0, 5.0, 0.52, 7);
+  createShelfUnit(-12.0, 0, -14.6, 0, 2.4, 5.0, 0.52, 7);
+  createShelfUnit(-6.8, 0, -14.6, 0, 2.8, 5.0, 0.52, 7);
+  createShelfUnit(6.8, 0, -14.6, 0, 2.8, 5.0, 0.52, 7);
+  createShelfUnit(12.0, 0, -14.6, 0, 2.4, 5.0, 0.52, 7);
+  createShelfUnit(16.4, 0, -14.6, 0, 3.0, 5.0, 0.52, 7);
 
-  // 3. Populate Hundreds of Procedural Books using THREE.InstancedMesh
-  const totalEstimatedBooks = 750;
+  // 2. West Wall Bookshelves (Entire Left Wall)
+  // X = -17.6, facing East (rotY = Math.PI / 2)
+  createShelfUnit(-17.6, 0, -11.0, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(-17.6, 0, -6.5, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(-17.6, 0, -2.0, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(-17.6, 0, 2.5, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(-17.6, 0, 7.0, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(-17.6, 0, 11.5, Math.PI / 2, 3.4, 5.0, 0.52, 7);
+
+  // 3. East Wall Bookshelves (Entire Right Wall)
+  // X = 17.6, facing West (rotY = -Math.PI / 2)
+  createShelfUnit(17.6, 0, -11.0, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(17.6, 0, -6.5, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(17.6, 0, -2.0, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(17.6, 0, 2.5, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(17.6, 0, 7.0, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+  createShelfUnit(17.6, 0, 11.5, -Math.PI / 2, 3.4, 5.0, 0.52, 7);
+
+  // 4. Free-Standing Room Partition Bookshelves (Dividing center avenue and table zones)
+  // Mid-height library partition shelving units (height 2.4m, 4 shelves)
+  createShelfUnit(-8.6, 0, -11.8, 0, 3.2, 2.4, 0.5, 4);
+  createShelfUnit(8.6, 0, -11.8, 0, 3.2, 2.4, 0.5, 4);
+  createShelfUnit(-8.6, 0, 12.8, 0, 3.2, 2.4, 0.5, 4);
+  createShelfUnit(8.6, 0, 12.8, 0, 3.2, 2.4, 0.5, 4);
+
+  // 5. Populate Thousands of Procedural Books using THREE.InstancedMesh
+  const totalEstimatedBooks = 2400;
   const bookGeo = new THREE.BoxGeometry(1, 1, 1);
   const bookMat = new THREE.MeshStandardMaterial({
     roughness: 0.75,
@@ -147,26 +173,21 @@ export function buildBookshelves(scene) {
     let curX = -slot.width / 2;
 
     while (curX < slot.width / 2 - 0.12 && bookIndex < totalEstimatedBooks) {
-      // Random book dimensions
-      const bThickness = 0.06 + rand() * 0.065;
-      const bHeight = THREE.MathUtils.clamp(0.28 + rand() * 0.22, 0.24, slot.maxHeight);
+      const bThickness = 0.055 + rand() * 0.07;
+      const bHeight = THREE.MathUtils.clamp(0.26 + rand() * 0.22, 0.22, slot.maxHeight);
       const bDepth = THREE.MathUtils.clamp(0.24 + rand() * 0.06, 0.2, slot.depth);
 
-      // Random slight tilt
-      const hasTilt = rand() > 0.82;
+      const hasTilt = rand() > 0.84;
       const tiltAngle = hasTilt ? (rand() - 0.5) * 0.22 : 0;
 
-      // Position in shelf local space
       const localX = curX + bThickness / 2;
       const localY = bHeight / 2;
       const localZ = (rand() - 0.5) * 0.03;
 
-      // Transform to world space
       dummy.position.set(localX, localY, localZ);
       dummy.rotation.set(0, 0, tiltAngle);
       dummy.scale.set(bThickness, bHeight, bDepth);
 
-      // Apply shelf orientation and position
       dummy.rotateY(slot.rotY);
       const worldPos = new THREE.Vector3(localX, localY, localZ)
         .applyAxisAngle(new THREE.Vector3(0, 1, 0), slot.rotY)
@@ -176,17 +197,15 @@ export function buildBookshelves(scene) {
       dummy.updateMatrix();
       instancedBooks.setMatrixAt(bookIndex, dummy.matrix);
 
-      // Assign muted palette color
       const hex = BOOK_PALETTE[Math.floor(rand() * BOOK_PALETTE.length)];
       color.set(hex);
       instancedBooks.setColorAt(bookIndex, color);
 
-      curX += bThickness + 0.012;
       bookIndex++;
+      curX += bThickness + 0.012;
     }
   });
 
-  instancedBooks.count = bookIndex;
   instancedBooks.instanceMatrix.needsUpdate = true;
   if (instancedBooks.instanceColor) {
     instancedBooks.instanceColor.needsUpdate = true;
@@ -194,7 +213,7 @@ export function buildBookshelves(scene) {
   scene.add(instancedBooks);
 
   return {
-    instancedBooks
+    instancedBooks,
+    totalBooks: bookIndex
   };
 }
-

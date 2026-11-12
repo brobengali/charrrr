@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f6efe2" />
-  <title>Hush Hall · A Quiet Virtual Library</title>
+  <meta name="theme-color" content="#19110a" />
+  <title>Hush Hall · Grand Study Cafe & Work Lounge</title>
   <link rel="icon" type="image/x-icon" href="/assets/favicon-_ZmbRfoM.ico" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon-DPZwm-Rt.png" />
   <link rel="manifest" href="/assets/manifest-bfHKEL_j.webmanifest" />
-  <script type="module" crossorigin src="/assets/index-bddgjozt.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BDbma1ED.css">
+  <script type="module" crossorigin src="/assets/index-D4j1d4Mp.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DGM3CcJw.css">
 </head>
 <body>
   <!-- Top Navigation Header -->
   <header class="app-header">
     <div class="header-left">
       <div class="brand">
-        <span class="brand-icon">🏛️</span>
+        <span class="brand-icon">☕</span>
         <span class="brand-title">Hush Hall</span>
       </div>
       <div class="room-selector-wrap">
-        <select id="room-selector" class="room-select" aria-label="Select study hall">
-          <option value="main-reading" selected>Main Reading Hall</option>
-          <option value="science-wing">Science Wing</option>
-          <option value="exam-season">Exam Season Hall</option>
-          <option value="night-owls">Night Owls Hall</option>
+        <select id="room-selector" class="room-select" aria-label="Select study cafe hall">
+          <option value="main-reading" selected>Grand Study Cafe</option>
+          <option value="science-wing">Executive Work Lounge</option>
+          <option value="exam-season">High-Focus Library Cafe</option>
+          <option value="night-owls">Midnight Espresso Hall</option>
         </select>
-        <span id="room-mood" class="room-mood">Big, quiet, long tables</span>
+        <span id="room-mood" class="room-mood">56 tables · face-to-face seating · formal focus</span>
       </div>
     </div>
 
@@ -66,7 +66,7 @@
     <!-- Bottom Center Hint Pill -->
     <div class="ui-bottom-center">
       <div id="hint-pill" class="hint-pill">
-        Tap a free desk to sit, or someone's desk to see their topic.
+        Tap any chair to take a seat, or someone's desk to view their project.
       </div>
     </div>
 
@@ -77,10 +77,10 @@
     <div id="floor-view-2d" class="floor-2d-overlay" style="display: none;">
       <div class="floor-2d-card">
         <div class="floor-2d-header">
-          <h2>Simple 2D Floor Plan</h2>
-          <span id="desks-count-badge" class="badge">8 Desks</span>
+          <h2>Grand Cafe Floor Plan</h2>
+          <span id="desks-count-badge" class="badge">56 Tables · 112 Seats</span>
         </div>
-        <p class="floor-2d-sub">Select any vacant desk to take your seat, or tap an occupied desk to inspect their topic.</p>
+        <p class="floor-2d-sub">Select any vacant chair (North or South side) to take your seat, or tap an occupied seat to view their work project.</p>
         <div id="desks-grid-2d" class="desks-grid"></div>
       </div>
     </div>
@@ -91,8 +91,8 @@
     <div class="focus-left">
       <div id="timer-display" class="timer-digits">25:00</div>
       <div class="focus-topic-wrap">
-        <span class="focus-label">Topic</span>
-        <span id="current-topic-label" class="current-topic">None (Pick a desk to sit)</span>
+        <span class="focus-label">Project / Topic</span>
+        <span id="current-topic-label" class="current-topic">None (Pick a chair to sit)</span>
       </div>
     </div>
 
@@ -109,49 +109,55 @@
     <div class="modal-card">
       <button class="close-btn" data-close="sit-modal" aria-label="Close">&times;</button>
       <div class="modal-title-row">
-        <h3 id="sit-modal-title">Take Desk A1</h3>
-        <span class="badge">Library Seat</span>
+        <h3 id="sit-modal-title">Take Seat T01-N</h3>
+        <span class="badge">Cafe Table</span>
       </div>
-      <p class="modal-sub">Write what you are working on. Others in the hall will only see your topic and avatar.</p>
+      <p class="modal-sub">Write what you are working on. Colleagues in the cafe will see your topic and formal avatar.</p>
 
       <div class="form-group">
-        <label for="input-study-topic">What are you studying or working on?</label>
-        <input type="text" id="input-study-topic" class="text-input" placeholder="e.g. Chapter 4 problem set, thesis revision..." maxlength="80" autofocus />
+        <label for="input-study-topic">What executive project or study topic are you working on?</label>
+        <input type="text" id="input-study-topic" class="text-input" placeholder="e.g. Q4 Strategy Review, Financial Modeling, System Architecture..." maxlength="90" autofocus />
       </div>
 
       <div class="modal-btn-row">
-        <button id="btn-confirm-sit" class="primary-btn">Take seat & start studying</button>
+        <button id="btn-confirm-sit" class="primary-btn">Take seat & start working</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal: Study Topic Card -->
+  <!-- Modal: Colleague Study/Work Topic Card -->
   <div id="topic-modal" class="modal-backdrop" style="display: none;">
     <div class="topic-card">
       <button class="close-btn" data-close="topic-modal" aria-label="Close">&times;</button>
       <div class="topic-header">
-        <div id="topic-avatar" class="topic-avatar">📖</div>
+        <div id="topic-avatar" class="topic-avatar">💼</div>
         <div>
-          <h3 id="topic-name">Reader</h3>
-          <span id="topic-seat" class="seat-badge">Desk A1</span>
+          <h3 id="topic-name">Colleague</h3>
+          <div id="topic-role" style="font-size: 0.85rem; color: #8c7355; font-weight: 500;">Executive Member</div>
+          <span id="topic-seat" class="seat-badge">Table T01 · North Seat</span>
         </div>
       </div>
       <div class="topic-divider"></div>
-      <div class="topic-label">Currently Studying</div>
-      <div id="topic-text" class="topic-body">Organic Chemistry: SN1 vs SN2 Mechanisms</div>
+      <div class="topic-label">Currently Working On</div>
+      <div id="topic-text" class="topic-body">Strategic Market Analysis</div>
     </div>
   </div>
 
-  <!-- Modal: Wardrobe Customizer -->
+  <!-- Modal: Wardrobe Customizer (Formal Office Attire) -->
   <div id="wardrobe-modal" class="modal-backdrop" style="display: none;">
     <div class="wardrobe-panel">
       <button class="close-btn" data-close="wardrobe-modal" aria-label="Close">&times;</button>
-      <h2>Wardrobe</h2>
-      <p class="wardrobe-subtitle">Customize your avatar's appearance in the library hall.</p>
+      <h2>Executive Wardrobe</h2>
+      <p class="wardrobe-subtitle">Customize your formal office attire and hair in the cafe hall.</p>
 
       <div class="wardrobe-section">
-        <label>Shirt Color</label>
-        <div id="shirt-swatches" class="color-swatches"></div>
+        <label>Suit & Blazer Color</label>
+        <div id="suit-swatches" class="color-swatches"></div>
+      </div>
+
+      <div class="wardrobe-section">
+        <label>Silk Tie Color</label>
+        <div id="tie-swatches" class="color-swatches"></div>
       </div>
 
       <div class="wardrobe-section">
@@ -159,7 +165,7 @@
         <div id="hair-swatches" class="color-swatches"></div>
       </div>
 
-      <button id="wardrobe-done" class="primary-btn">Save & Close</button>
+      <button id="wardrobe-done" class="primary-btn" data-close="wardrobe-modal">Save & Close</button>
     </div>
   </div>
 
@@ -168,11 +174,11 @@
     <div class="modal-card wide">
       <button class="close-btn" data-close="notes-modal" aria-label="Close">&times;</button>
       <div class="modal-title-row">
-        <h3>Desk Scratchpad Notes</h3>
+        <h3>Executive Scratchpad & Notes</h3>
         <span class="badge">Private to your browser</span>
       </div>
-      <p class="modal-sub">Jot down reference links, formula reminders, and to-do items while you study.</p>
-      <textarea id="notes-textarea" class="notes-input" placeholder="Type study notes here... auto-saved to localStorage"></textarea>
+      <p class="modal-sub">Jot down reference links, project checklists, and to-do items while you work.</p>
+      <textarea id="notes-textarea" class="notes-input" placeholder="Type project notes here... auto-saved to localStorage"></textarea>
       <div class="modal-btn-row">
         <button id="btn-save-notes" class="primary-btn">Save notes</button>
       </div>
@@ -184,10 +190,10 @@
     <div class="modal-card">
       <button class="close-btn" data-close="hours-modal" aria-label="Close">&times;</button>
       <div class="modal-title-row">
-        <h3>Weekly Study Log</h3>
+        <h3>Weekly Work & Study Log</h3>
         <span id="hours-total-badge" class="badge">0 hrs this week</span>
       </div>
-      <p class="modal-sub">Quiet, focused minutes logged in Hush Hall over the past 7 days.</p>
+      <p class="modal-sub">Deep focus minutes logged in Hush Hall over the past 7 days.</p>
       <div id="hours-log-list" class="hours-list">
         <div class="empty-state">No sessions logged yet. Complete a 25-minute focus round to log hours!</div>
       </div>

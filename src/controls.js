@@ -3,17 +3,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 
 export function setupControls(camera, renderer, domElement) {
-  // 1. OrbitControls (Default elevated isometric perspective)
+  // 1. OrbitControls (Default elevated isometric perspective over the cafe hall)
   const orbit = new OrbitControls(camera, domElement);
   orbit.enableDamping = true;
   orbit.dampingFactor = 0.05;
-  orbit.minDistance = 5;
-  orbit.maxDistance = 28;
-  orbit.maxPolarAngle = Math.PI / 2 - 0.06; // Prevent going below floor
+  orbit.minDistance = 6;
+  orbit.maxDistance = 65;
+  orbit.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent going below floor
   orbit.target.set(0, 1.2, 0);
 
   // Default Orbit Camera Pose
-  const defaultOrbitPos = new THREE.Vector3(13, 10.5, 14.5);
+  const defaultOrbitPos = new THREE.Vector3(22, 17, 24);
   const defaultOrbitTarget = new THREE.Vector3(0, 1.2, 0);
 
   // 2. PointerLockControls for First-Person Walk Mode
@@ -37,19 +37,37 @@ export function setupControls(camera, renderer, domElement) {
   // Collision Obstacle Bounding Boxes [minX, maxX, minZ, maxZ]
   const COLLIDERS = [
     // Outer Room Walls
-    { minX: -100, maxX: -9.4, minZ: -100, maxZ: 100 },
-    { minX: 9.4, maxX: 100, minZ: -100, maxZ: 100 },
-    { minX: -100, maxX: 100, minZ: -100, maxZ: -6.4 },
-    { minX: -100, maxX: 100, minZ: 6.6, maxZ: 100 },
+    { minX: -100, maxX: -17.0, minZ: -100, maxZ: 100 },
+    { minX: 17.0, maxX: 100, minZ: -100, maxZ: 100 },
+    { minX: -100, maxX: 100, minZ: -100, maxZ: -14.0 },
+    { minX: -100, maxX: 100, minZ: 14.0, maxZ: 100 },
 
-    // Desks North Bank
-    { minX: -5.6, maxX: 5.6, minZ: -4.3, maxZ: -2.1 },
+    // Barista Espresso Bar
+    { minX: -5.2, maxX: 5.2, minZ: -14.2, maxZ: -12.2 },
 
-    // Desks South Bank
-    { minX: -5.6, maxX: 5.6, minZ: 1.4, maxZ: 3.6 }
+    // Room Divider Bookshelves
+    { minX: -10.4, maxX: -6.8, minZ: -12.4, maxZ: -11.2 },
+    { minX: 6.8, maxX: 10.4, minZ: -12.4, maxZ: -11.2 },
+    { minX: -10.4, maxX: -6.8, minZ: 12.2, maxZ: 13.4 },
+    { minX: 6.8, maxX: 10.4, minZ: 12.2, maxZ: 13.4 }
   ];
 
-  function checkCollision(x, z, radius = 0.35) {
+  // Add 56 Table Colliders
+  const colX = [-14.2, -10.6, -7.0, -3.4, 3.4, 7.0, 10.6, 14.2];
+  const rowZ = [-9.2, -5.8, -2.4, 1.0, 4.4, 7.8, 11.2];
+
+  colX.forEach(tx => {
+    rowZ.forEach(tz => {
+      COLLIDERS.push({
+        minX: tx - 0.82,
+        maxX: tx + 0.82,
+        minZ: tz - 0.52,
+        maxZ: tz + 0.52
+      });
+    });
+  });
+
+  function checkCollision(x, z, radius = 0.3) {
     for (const b of COLLIDERS) {
       if (
         x + radius > b.minX &&
@@ -123,7 +141,7 @@ export function setupControls(camera, renderer, domElement) {
     if (startPos) {
       camera.position.set(startPos.x, playerHeight, startPos.z);
     } else {
-      camera.position.set(0, playerHeight, 5.2);
+      camera.position.set(0, playerHeight, 13.0);
     }
     camera.lookAt(0, playerHeight, 0);
 
@@ -157,16 +175,16 @@ export function setupControls(camera, renderer, domElement) {
   function zoomIn() {
     if (isFirstPerson) return;
     const dir = new THREE.Vector3().subVectors(orbit.target, camera.position).normalize();
-    if (camera.position.distanceTo(orbit.target) > orbit.minDistance + 0.8) {
-      camera.position.addScaledVector(dir, 1.5);
+    if (camera.position.distanceTo(orbit.target) > orbit.minDistance + 1.0) {
+      camera.position.addScaledVector(dir, 2.0);
     }
   }
 
   function zoomOut() {
     if (isFirstPerson) return;
     const dir = new THREE.Vector3().subVectors(camera.position, orbit.target).normalize();
-    if (camera.position.distanceTo(orbit.target) < orbit.maxDistance - 0.8) {
-      camera.position.addScaledVector(dir, 1.5);
+    if (camera.position.distanceTo(orbit.target) < orbit.maxDistance - 1.0) {
+      camera.position.addScaledVector(dir, 2.0);
     }
   }
 
@@ -181,7 +199,7 @@ export function setupControls(camera, renderer, domElement) {
       direction.x = Number(moveState.right) - Number(moveState.left);
       direction.normalize();
 
-      const speed = moveState.sprint ? 4.2 : 2.4;
+      const speed = moveState.sprint ? 5.0 : 2.8;
 
       if (moveState.forward || moveState.backward) {
         velocity.z -= direction.z * speed * 12.0 * delta;
@@ -199,14 +217,11 @@ export function setupControls(camera, renderer, domElement) {
 
       // Collision Resolution
       if (checkCollision(camera.position.x, camera.position.z)) {
-        // Try sliding on X
         if (!checkCollision(camera.position.x, prevZ)) {
           camera.position.z = prevZ;
         } else if (!checkCollision(prevX, camera.position.z)) {
-          // Try sliding on Z
           camera.position.x = prevX;
         } else {
-          // Revert both
           camera.position.x = prevX;
           camera.position.z = prevZ;
         }
@@ -239,4 +254,3 @@ export function setupControls(camera, renderer, domElement) {
 
   return controlsAPI;
 }
-
