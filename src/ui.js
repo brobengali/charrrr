@@ -4,13 +4,13 @@ import { StudySession } from './timer.js';
 
 // Room Moods & Descriptions
 const ROOM_INFO = {
-  'main-reading': { name: 'Grand Study Cafe', mood: '56 tables · face-to-face seating · formal focus' },
+  'main-reading': { name: 'Grand Study Cafe', mood: '56 tables · face-to-face seating · curated genre shelves' },
   'science-wing': { name: 'Executive Work Lounge', mood: 'Quiet analysis · coffee roasts · strategy decks' },
   'exam-season': { name: 'High-Focus Library Cafe', mood: 'Deadlines · deep problem sets · quiet laptops' },
   'night-owls': { name: 'Midnight Espresso Hall', mood: 'Late-night steam · dim lamps · calm focus' }
 };
 
-export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
+export function setupUI(camera, scene, domElement, controls, furnitureAPI, booksAPI = null) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2(-999, -999);
 
@@ -87,6 +87,15 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
   const topicSeat = document.getElementById('topic-seat');
   const topicText = document.getElementById('topic-text');
 
+  // Bookshelf Genre Modal
+  const genreModal = document.getElementById('genre-modal');
+  const genreIcon = document.getElementById('genre-icon');
+  const genreTitle = document.getElementById('genre-title');
+  const genreLocation = document.getElementById('genre-location');
+  const genreBookList = document.getElementById('genre-book-list');
+  const btnReadGenreBook = document.getElementById('btn-read-genre-book');
+  let activeGenreData = null;
+
   const wardrobeModal = document.getElementById('wardrobe-modal');
   const suitSwatches = document.getElementById('suit-swatches');
   const tieSwatches = document.getElementById('tie-swatches');
@@ -111,7 +120,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
       const info = ROOM_INFO[selectedRoom] || ROOM_INFO['main-reading'];
       if (roomMood) roomMood.textContent = info.mood;
       render2DFloorGrid();
-      hintPill.textContent = `Moved to ${info.name} · Choose any free chair to sit`;
+      hintPill.textContent = `Moved to ${info.name} · Pick any chair or book rack`;
     });
   }
 
@@ -146,7 +155,6 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     if (!desksGrid2D) return;
     desksGrid2D.innerHTML = '';
 
-    // Group seats by tableId
     const tablesMap = new Map();
     furnitureAPI.desksData.forEach(seat => {
       if (!tablesMap.has(seat.tableId)) {
@@ -174,7 +182,6 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         </div>
       `;
 
-      // Click listener for each seat in 2D
       tableCard.querySelectorAll('[data-seat]').forEach(seatEl => {
         seatEl.addEventListener('click', () => {
           const sId = seatEl.getAttribute('data-seat');
@@ -223,7 +230,6 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
           hintPill.textContent = `Sitting at ${selectedSeatForSit} · Project: ${topic}`;
           btnStandUp.style.display = 'inline-block';
 
-          // Animate Orbit camera towards user's chair
           const seatObj = furnitureAPI.desksData.find(d => d.id === selectedSeatForSit);
           if (seatObj) {
             const target = new THREE.Vector3(
@@ -253,7 +259,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         session.mySeat = null;
         currentTopicLabel.textContent = 'None (Pick a chair to sit)';
         btnStandUp.style.display = 'none';
-        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
       }
     });
   }
@@ -299,7 +305,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
       } else {
         controls.startWalkMode();
         btnWalk.textContent = 'Exit walk';
@@ -314,7 +320,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to take a seat, or someone's desk to view their project.";
+        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a bookshelf to browse its genre.";
       }
     };
   }
@@ -346,7 +352,60 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     topicModal.style.display = 'flex';
   }
 
-  // 12. Wardrobe Modal (Formal Office Attire)
+  // 12. Bookshelf Genre Modal
+  function showGenreModal(genreData) {
+    if (!genreData) return;
+    activeGenreData = genreData;
+
+    if (genreIcon) genreIcon.textContent = genreData.icon || '📚';
+    if (genreTitle) genreTitle.textContent = genreData.title;
+    if (genreLocation) genreLocation.textContent = genreData.location || 'Cafe Library';
+
+    if (genreBookList) {
+      genreBookList.innerHTML = '';
+      (genreData.books || []).forEach(bTitle => {
+        const li = document.createElement('li');
+        li.className = 'genre-book-item';
+        li.innerHTML = `<span>📖</span> <span>${bTitle}</span>`;
+        li.addEventListener('click', () => {
+          genreModal.style.display = 'none';
+          applyBookTopic(bTitle, genreData.title);
+        });
+        genreBookList.appendChild(li);
+      });
+    }
+
+    if (genreModal) {
+      genreModal.style.display = 'flex';
+    }
+  }
+
+  function applyBookTopic(bookTitle, genreName) {
+    if (session.mySeat) {
+      session.startFocus(bookTitle);
+      currentTopicLabel.textContent = `${bookTitle} (${session.mySeat})`;
+      hintPill.textContent = `Reading from ${genreName}: ${bookTitle}`;
+    } else {
+      const vacantSeat = furnitureAPI.desksData.find(d => !d.occupied);
+      if (vacantSeat) {
+        selectedSeatForSit = vacantSeat.id;
+        openSitModal(vacantSeat.id, vacantSeat.tableId, vacantSeat.side);
+        inputStudyTopic.value = bookTitle;
+      }
+    }
+  }
+
+  if (btnReadGenreBook) {
+    btnReadGenreBook.addEventListener('click', () => {
+      if (activeGenreData && activeGenreData.books.length > 0) {
+        const randomBook = activeGenreData.books[Math.floor(Math.random() * activeGenreData.books.length)];
+        genreModal.style.display = 'none';
+        applyBookTopic(randomBook, activeGenreData.title);
+      }
+    });
+  }
+
+  // 13. Wardrobe Modal (Formal Office Attire)
   function buildSwatches(container, colors, selectedColor, onSelect) {
     if (!container) return;
     container.innerHTML = '';
@@ -381,7 +440,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     });
   }
 
-  // 13. Notes Modal
+  // 14. Notes Modal
   if (btnOpenNotes) {
     btnOpenNotes.addEventListener('click', () => {
       notesTextarea.value = session.loadNotes();
@@ -397,7 +456,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     });
   }
 
-  // 14. Weekly Hours Modal
+  // 15. Weekly Hours Modal
   if (btnOpenHours) {
     btnOpenHours.addEventListener('click', () => {
       const mins = session.getWeeklyFocusMinutes();
@@ -420,7 +479,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     });
   }
 
-  // 15. Generic Modal Close Listeners
+  // 16. Generic Modal Close Listeners
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.addEventListener('click', () => {
       const modalId = btn.getAttribute('data-close');
@@ -429,7 +488,12 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     });
   });
 
-  // 16. Raycast Desk Interaction (3D Scene)
+  // 17. Raycast Interaction (Desks & Bookshelf Genres)
+  const getAllClickables = () => [
+    ...furnitureAPI.deskClickables,
+    ...(booksAPI?.shelfClickables || [])
+  ];
+
   domElement.addEventListener('pointermove', e => {
     const rect = domElement.getBoundingClientRect();
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -437,7 +501,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
 
     if (!controls.isFirstPerson && currentView === '3d') {
       raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(furnitureAPI.deskClickables, false);
+      const hits = raycaster.intersectObjects(getAllClickables(), false);
       domElement.style.cursor = hits.length > 0 ? 'pointer' : 'default';
     }
   });
@@ -447,13 +511,15 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
     if (e.target.closest('.pill-btn, .zoom-btn, .modal-backdrop, .app-header, .focusbar')) return;
 
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(furnitureAPI.deskClickables, false);
+    const hits = raycaster.intersectObjects(getAllClickables(), false);
 
     if (hits.length > 0) {
       const hit = hits[0].object;
       const data = hit.userData;
 
-      if (data.occupied) {
+      if (data.isShelf) {
+        showGenreModal(data.genreData);
+      } else if (data.occupied) {
         showTopicModal(data.studentData, data.seatId, data.tableId, data.side);
       } else {
         openSitModal(data.seatId, data.tableId, data.side);
@@ -463,6 +529,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI) {
 
   return {
     session,
-    showTopicModal
+    showTopicModal,
+    showGenreModal
   };
 }

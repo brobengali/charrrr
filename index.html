@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +11,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
+
 <body>
   <!-- Top Navigation Header -->
   <header class="app-header">
@@ -79,7 +81,8 @@
           <h2>Grand Cafe Floor Plan</h2>
           <span id="desks-count-badge" class="badge">56 Tables · 112 Seats</span>
         </div>
-        <p class="floor-2d-sub">Select any vacant chair (North or South side) to take your seat, or tap an occupied seat to view their work project.</p>
+        <p class="floor-2d-sub">Select any vacant chair (North or South side) to take your seat, or tap an occupied seat
+          to view their work project.</p>
         <div id="desks-grid-2d" class="desks-grid"></div>
       </div>
     </div>
@@ -111,11 +114,13 @@
         <h3 id="sit-modal-title">Take Seat T01-N</h3>
         <span class="badge">Cafe Table</span>
       </div>
-      <p class="modal-sub">Write what you are working on. Colleagues in the cafe will see your topic and formal avatar.</p>
+      <p class="modal-sub">Write what you are working on. Colleagues in the cafe will see your topic and formal avatar.
+      </p>
 
       <div class="form-group">
         <label for="input-study-topic">What executive project or study topic are you working on?</label>
-        <input type="text" id="input-study-topic" class="text-input" placeholder="e.g. Q4 Strategy Review, Financial Modeling, System Architecture..." maxlength="90" autofocus />
+        <input type="text" id="input-study-topic" class="text-input"
+          placeholder="e.g. Q4 Strategy Review, Financial Modeling, System Architecture..." maxlength="90" autofocus />
       </div>
 
       <div class="modal-btn-row">
@@ -139,6 +144,27 @@
       <div class="topic-divider"></div>
       <div class="topic-label">Currently Working On</div>
       <div id="topic-text" class="topic-body">Strategic Market Analysis</div>
+    </div>
+  </div>
+
+  <!-- Modal: Bookshelf Genre & Curated Titles Card -->
+  <div id="genre-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card wide">
+      <button class="close-btn" data-close="genre-modal" aria-label="Close">&times;</button>
+      <div class="topic-header">
+        <div id="genre-icon" class="topic-avatar">📚</div>
+        <div>
+          <span class="badge" style="background:#ecdcb9; color:#493018; margin-bottom:4px; display:inline-block;">Bookshelf Category</span>
+          <h3 id="genre-title">Economics & Markets</h3>
+          <span id="genre-location" class="seat-badge">North Gallery · Bookcase I</span>
+        </div>
+      </div>
+      <div class="topic-divider"></div>
+      <div class="topic-label" style="margin-bottom:8px;">Curated Reference Titles on this Shelf:</div>
+      <ul id="genre-book-list" class="genre-book-list"></ul>
+      <div class="modal-btn-row" style="margin-top:16px;">
+        <button id="btn-read-genre-book" class="primary-btn">Study a title from this shelf</button>
+      </div>
     </div>
   </div>
 
@@ -177,7 +203,8 @@
         <span class="badge">Private to your browser</span>
       </div>
       <p class="modal-sub">Jot down reference links, project checklists, and to-do items while you work.</p>
-      <textarea id="notes-textarea" class="notes-input" placeholder="Type project notes here... auto-saved to localStorage"></textarea>
+      <textarea id="notes-textarea" class="notes-input"
+        placeholder="Type project notes here... auto-saved to localStorage"></textarea>
       <div class="modal-btn-row">
         <button id="btn-save-notes" class="primary-btn">Save notes</button>
       </div>
@@ -201,4 +228,5 @@
 
   <script type="module" src="/src/main.js"></script>
 </body>
+
 </html>
