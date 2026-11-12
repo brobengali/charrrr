@@ -1,0 +1,23 @@
+{
+  "name": "hush-hall",
+  "version": "1.0.0",
+  "description": "Hush Hall · a quiet virtual library: take a desk, write your topic, study quietly next to others.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "hush-hall",
+    "virtual-library",
+    "study-space",
+    "focus",
+    "pomodoro",
+    "minimalist"
+  ],
+  "author": "Chinmaye Mankatalia",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^3.10.1"
+  }
+}

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/_next/static/immutable/chunks/1asutk68d-geq.css" data-precedence="next" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="./style.css" />
+  <meta name="theme-color" content="#f6efe2" />
+  <title>Hush Hall · a quiet virtual library</title>
+  <meta name="description" content="Take a desk, write your topic, study quietly next to others." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">Hush Hall</a>
+    <span class="tagline">a quiet virtual library</span>
+  </header>
+
+  <main>
+    <div id="lobby-root">
+      <section class="hero">
+        <h1>Welcome to the library.</h1>
+        <p class="muted">Pick a hall, take a desk, write what you are working on. Everyone here is studying quietly.</p>
+      </section>
+
+      <div class="grid2">
+        <!-- Library Card -->
+        <section class="card">
+          <h2>Your library card</h2>
+          <label for="nickname-input">Nickname (shown on your desk with your avatar and topic, nothing else)</label>
+          <input id="nickname-input" type="text" maxlength="24" placeholder="e.g. Owl" value="Reader" />
+          <p id="save-status" class="small muted" style="min-height: 1.2em; margin: 4px 0 0 0;"></p>
+
+          <label>Avatar</label>
+          <div class="avatars" id="avatars-picker"></div>
+
+          <label>Privacy</label>
+          <span class="toggle">
+            <input type="checkbox" id="hide-requests-check" />
+            Hide me from study-room requests
+          </span>
+
+          <p class="small muted" style="margin-top: 14px;">
+            <a href="/me">My study log &amp; account</a> · <a href="/rules">House rules</a> · <a href="/privacy">Privacy policy</a>
+          </p>
+        </section>
+
+        <!-- This Week Focus -->
+        <section class="card">
+          <h2>This week</h2>
+          <div id="focus-summary">
+            <p class="muted" id="focus-headline">Nothing logged yet this week. Any desk, any time, is a good start.</p>
+            <p class="small muted" id="month-headline"></p>
+            <ul class="history small muted" id="recent-sittings" style="padding-left: 18px; margin-top: 8px;"></ul>
+          </div>
+        </section>
+      </div>
+
+      <h2 style="margin-top: 28px;">Public halls</h2>
+      <div class="grid2" id="halls-list">
+        <a href="/hall/main-reading" class="card door">
+          <h3>Main Reading Hall</h3>
+          <div class="muted small">Big, quiet, long tables</div>
+          <div class="rule small">Silent. Nods only.</div>
+          <div class="small" style="margin-top: 6px;">5 studying now</div>
+        </a>
+
+        <a href="/hall/science-wing" class="card door">
+          <h3>Science Wing</h3>
+          <div class="muted small">Labs, papers, problem sets</div>
+          <div class="rule small">Silent. Diagrams welcome.</div>
+          <div class="small" style="margin-top: 6px;">6 studying now</div>
+        </a>
+
+        <a href="/hall/exam-season" class="card door">
+          <h3>Exam Season Hall</h3>
+          <div class="muted small">Deadlines and steady pages</div>
+          <div class="rule small">Silent. One topic per desk.</div>
+          <div class="small" style="margin-top: 6px;">4 studying now</div>
+        </a>
+
+        <a href="/hall/night-owls" class="card door">
+          <h3>Night Owls</h3>
+          <div class="muted small">Late-night lamps</div>
+          <div class="rule small">Silent. Be kind to tired eyes.</div>
+          <div class="small" style="margin-top: 6px;">5 studying now</div>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const AVATARS = ["🦉", "📖", "🌿", "☕", "🐢", "🌙", "🪴", "🦊", "🐼", "✏️"];
+      const PROFILE_KEY = "hh.profile";
+      const TAB_PROFILE_KEY = "hh.tabProfile";
+      const HISTORY_KEY = "hh.history";
+
+      function getStoredProfile() {
+        try {
+          const tab = sessionStorage.getItem(TAB_PROFILE_KEY);
+          if (tab) return JSON.parse(tab);
+          const local = localStorage.getItem(PROFILE_KEY);
+          if (local) return JSON.parse(local);
+        } catch (e) {}
+
+        const defaultProfile = {
+          id: "me-" + Math.random().toString(36).slice(2, 10),
+          name: "Reader",
+          avatar: "📖",
+          color: "#e9d8a6",
+          hideFromRequests: false,
+          focusMin: 25,
+          breakMin: 5,
+          chime: false
+        };
+        saveProfile(defaultProfile);
+        return defaultProfile;
+      }
+
+      function saveProfile(p) {
+        try {
+          localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+          sessionStorage.setItem(TAB_PROFILE_KEY, JSON.stringify(p));
+        } catch (e) {}
+      }
+
+      function getHistory() {
+        try {
+          const h = localStorage.getItem(HISTORY_KEY);
+          return h ? JSON.parse(h) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      let profile = getStoredProfile();
+
+      // Setup Nickname Input
+      const nameInput = document.getElementById("nickname-input");
+      const saveStatus = document.getElementById("save-status");
+      if (nameInput) {
+        nameInput.value = profile.name || "Reader";
+        let debounceTimer = null;
+        nameInput.addEventListener("input", function (e) {
+          profile.name = e.target.value.trim().slice(0, 24);
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            saveProfile(profile);
+            if (saveStatus) {
+              saveStatus.textContent = "Saved";
+              setTimeout(() => { saveStatus.textContent = ""; }, 1500);
+            }
+          }, 400);
+        });
+      }
+
+      // Setup Avatar Picker
+      const avatarContainer = document.getElementById("avatars-picker");
+      if (avatarContainer) {
+        avatarContainer.innerHTML = "";
+        AVATARS.forEach(ava => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "avatar-pick" + (profile.avatar === ava ? " on" : "");
+          btn.setAttribute("aria-label", "avatar " + ava);
+          btn.textContent = ava;
+          btn.addEventListener("click", () => {
+            profile.avatar = ava;
+            saveProfile(profile);
+            document.querySelectorAll(".avatar-pick").forEach(b => b.classList.remove("on"));
+            btn.classList.add("on");
+          });
+          avatarContainer.appendChild(btn);
+        });
+      }
+
+      // Setup Privacy Checkbox
+      const hideCheck = document.getElementById("hide-requests-check");
+      if (hideCheck) {
+        hideCheck.checked = !!profile.hideFromRequests;
+        hideCheck.addEventListener("change", function (e) {
+          profile.hideFromRequests = e.target.checked;
+          saveProfile(profile);
+        });
+      }
+
+      // Setup This Week Summary
+      const history = getHistory();
+      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const weekSittings = history.filter(s => s.at >= oneWeekAgo);
+
+      if (weekSittings.length > 0) {
+        const totalMinutes = weekSittings.reduce((acc, s) => acc + (s.minutes || 0), 0);
+        const daysSet = new Set(weekSittings.map(s => new Date(s.at).toDateString()));
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        const daysCount = daysSet.size;
+
+        const headline = document.getElementById("focus-headline");
+        if (headline) {
+          headline.textContent = `${hours} h ${mins} min of focus across ${daysCount} ${daysCount === 1 ? "day" : "days"}. Nice, steady work.`;
+        }
+
+        const recentList = document.getElementById("recent-sittings");
+        if (recentList) {
+          recentList.innerHTML = "";
+          weekSittings.slice(0, 4).forEach(s => {
+            const li = document.createElement("li");
+            const dateStr = new Date(s.at).toLocaleDateString();
+            li.textContent = `${dateStr} · ${s.topic || "Focus session"} · ${s.minutes} min${s.note ? ' · "' + s.note + '"' : ""}`;
+            recentList.appendChild(li);
+          });
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

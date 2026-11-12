@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f6efe2"/>
+  <title>Moderation queue · Hush Hall</title>
+  <meta name="description" content="Take a desk, write your topic, study quietly next to others."/>
+  <link rel="stylesheet" href="/style.css"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">Hush Hall</a>
+    <span class="tagline">a quiet virtual library</span>
+  </header>
+  <main>
+    <div id="mod-app">
+      <div class="hall-head">
+        <h1>Report queue</h1>
+        <select id="queue-filter" style="width:auto">
+          <option value="open">Open and in review</option>
+          <option value="actioned">Actioned</option>
+          <option value="dismissed">Dismissed</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <p class="small muted">Check once a day. Urgent reports (harassment and safety) show an “act by” time 24 hours after they were filed.</p>
+      <div id="status-msg" class="small muted" style="display:none;margin-bottom:12px"></div>
+      <div id="reports-list"></div>
+    </div>
+  </main>
+  <script>
+    (function() {
+      const actions = [
+        { id: "none", label: "No action" },
+        { id: "warn", label: "Warn (private notice)" },
+        { id: "remove_topic", label: "Remove topic" },
+        { id: "suspend_rooms", label: "Suspend rooms + requests" },
+        { id: "ban", label: "Close account (ban)" },
+        { id: "restore", label: "Lift all holds" }
+      ];
+
+      function getReports() {
+        try {
+          return JSON.parse(localStorage.getItem('hh.reports') || '[]');
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function saveReports(reps) {
+        localStorage.setItem('hh.reports', JSON.stringify(reps));
+      }
+
+      const listEl = document.getElementById('reports-list');
+      const filterEl = document.getElementById('queue-filter');
+      const msgEl = document.getElementById('status-msg');
+
+      function render() {
+        const reps = getReports();
+        const filter = filterEl.value;
+        const filtered = reps.filter(r => {
+          if (filter === 'all') return true;
+          if (filter === 'open') return r.status === 'open' || r.status === 'reviewing';
+          return r.status === filter;
+        });
+
+        if (filtered.length === 0) {
+          listEl.innerHTML = '<p class="muted">Nothing here. Quiet day.</p>';
+          return;
+        }
+
+        listEl.innerHTML = '';
+        filtered.forEach(r => {
+          const card = document.createElement('section');
+          card.className = 'card';
+          card.style.marginBottom = '12px';
+
+          const urgent = r.urgent || r.reason === 'harassment';
+          const actBy = r.due_at || (r.created_at + 86400000);
+          const pastDue = Date.now() > actBy && (r.status === 'open' || r.status === 'reviewing');
+
+          card.innerHTML = `
+            <div class="row" style="justify-content:space-between">
+              <b>${escapeHtml(r.reason || 'Report')}${urgent ? ' · urgent' : ''}</b>
+              <span class="small muted">${new Date(r.created_at).toLocaleString()} · ${r.status}${actBy ? ` · act by ${new Date(actBy).toLocaleString()}${pastDue ? ' (past due)' : ''}` : ''}</span>
+            </div>
+            <p class="small">Reported: <b>${escapeHtml(r.reported_nickname || 'Unknown')}</b>${r.reported_topic ? ` · topic “${escapeHtml(r.reported_topic)}”` : ''} · ${r.reports_on_account || 1} report on this account</p>
+            <p class="small muted">From: ${escapeHtml(r.reporter_nickname || 'Reader')} · ${r.hall_id ? 'hall ' + escapeHtml(r.hall_id) : 'library'}</p>
+            ${r.note ? `<p class="small">“${escapeHtml(r.note)}”</p>` : ''}
+            <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <select class="act-select" style="width:auto">
+                ${actions.map(a => `<option value="${a.id}" ${r.action === a.id ? 'selected' : ''}>${a.label}</option>`).join('')}
+              </select>
+              <input type="text" class="mod-note-input" maxlength="500" placeholder="Private note (optional)" value="${escapeHtml(r.mod_note || '')}" style="flex:1;min-width:180px"/>
+              <button class="ghost small btn-review">Mark in review</button>
+              <button class="ghost small btn-dismiss">Dismiss</button>
+              <button class="sage small btn-save">Save action</button>
+            </div>
+          `;
+
+          const sel = card.querySelector('.act-select');
+          const noteIn = card.querySelector('.mod-note-input');
+
+          card.querySelector('.btn-review').onclick = () => decide(r.id, 'reviewing', sel.value, noteIn.value);
+          card.querySelector('.btn-dismiss').onclick = () => decide(r.id, 'dismissed', 'none', noteIn.value);
+          card.querySelector('.btn-save').onclick = () => decide(r.id, 'actioned', sel.value, noteIn.value);
+
+          listEl.appendChild(card);
+        });
+      }
+
+      function decide(id, status, action, note) {
+        const reps = getReports();
+        const rep = reps.find(r => r.id === id);
+        if (rep) {
+          rep.status = status;
+          rep.action = action;
+          rep.mod_note = note;
+          saveReports(reps);
+          msgEl.style.display = 'block';
+          msgEl.textContent = 'Saved.';
+          setTimeout(() => { msgEl.style.display = 'none'; }, 2000);
+          render();
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+      }
+
+      filterEl.onchange = render;
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/_next/static/immutable/chunks/1asutk68d-geq.css" data-precedence="next" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="../style.css" />
+  <meta name="theme-color" content="#f6efe2" />
+  <title>My study log · Hush Hall</title>
+  <meta name="description" content="Take a desk, write your topic, study quietly next to others." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" href="/favicon.ico" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">Hush Hall</a>
+    <span class="tagline">a quiet virtual library</span>
+  </header>
+
+  <main>
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
+      <h1 style="margin: 0;">My study log</h1>
+      <a href="/" class="small">Lobby</a>
+    </div>
+
+    <div class="grid2">
+      <!-- So far -->
+      <section class="card">
+        <h2>So far</h2>
+        <p id="stat-week">This week: 0 h 0 min across 0 days.</p>
+        <p class="muted small" id="stat-alltime">All time: 0 h 0 min over 0 days of showing up.</p>
+        <p class="small muted">Missed days don’t count against anything here. Every sitting adds; nothing resets.</p>
+      </section>
+
+      <!-- Settings -->
+      <section class="card">
+        <h2>Settings</h2>
+        <label for="me-nick">Nickname (shown on your desk with your avatar and topic)</label>
+        <input id="me-nick" type="text" maxlength="24" value="Reader" />
+
+        <label>Avatar</label>
+        <div class="avatars" id="me-avatars"></div>
+
+        <label for="me-rhythm">Default rhythm</label>
+        <select id="me-rhythm">
+          <option value="25/5">25 min focus · 5 min break</option>
+          <option value="50/10">50 min focus · 10 min break</option>
+          <option value="15/3">15 min focus · 3 min break</option>
+        </select>
+
+        <span class="toggle" style="margin-top: 10px;">
+          <input type="checkbox" id="me-chime" />
+          Play gentle chime when focus/break ends
+        </span>
+
+        <span class="toggle" style="margin-top: 8px;">
+          <input type="checkbox" id="me-hide" />
+          Hide me from study-room requests
+        </span>
+
+        <p id="me-status" class="small muted" style="min-height: 1.2em; margin-top: 8px;"></p>
+      </section>
+
+      <!-- Usual desks -->
+      <section class="card">
+        <h2>Usual desks</h2>
+        <p class="muted small">Your favorite desks in each reading room:</p>
+        <ul class="history small muted" id="usual-seats-list" style="padding-left: 18px;">
+          <li>Main Reading Hall: <span id="seat-main">None selected</span></li>
+          <li>Science Wing: <span id="seat-science">None selected</span></li>
+          <li>Exam Season Hall: <span id="seat-exam">None selected</span></li>
+          <li>Night Owls: <span id="seat-night">None selected</span></li>
+        </ul>
+      </section>
+
+      <!-- Delete Data -->
+      <section class="card" id="delete-account">
+        <h2>Delete account &amp; data</h2>
+        <p class="small muted">Permanently erase your study log, profile, usual desks, timetable, and notes from this browser.</p>
+        <label for="del-confirm" class="small">Type DELETE to confirm</label>
+        <div class="row">
+          <input id="del-confirm" type="text" placeholder="DELETE" style="width: 140px;" />
+          <button type="button" class="ghost small" id="del-btn" disabled>Delete data</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sittings History -->
+    <h2 style="margin-top: 28px;">Recent study sittings</h2>
+    <div class="card" style="margin-top: 8px;">
+      <ul class="history small muted" id="full-history-list" style="padding-left: 18px; margin: 0;">
+        <li>No sittings logged yet. Take any desk in any hall to start your first session.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const AVATARS = ["🦉", "📖", "🌿", "☕", "🐢", "🌙", "🪴", "🦊", "🐼", "✏️"];
+      const PROFILE_KEY = "hh.profile";
+      const TAB_PROFILE_KEY = "hh.tabProfile";
+      const HISTORY_KEY = "hh.history";
+      const USUAL_SEATS_KEY = "hh.usualSeat";
+
+      function getProfile() {
+        try {
+          return JSON.parse(localStorage.getItem(PROFILE_KEY) || sessionStorage.getItem(TAB_PROFILE_KEY) || "{}");
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function saveProfile(p) {
+        try {
+          localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+          sessionStorage.setItem(TAB_PROFILE_KEY, JSON.stringify(p));
+        } catch (e) {}
+      }
+
+      function getHistory() {
+        try {
+          return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+
+      const profile = {
+        name: "Reader",
+        avatar: "📖",
+        focusMin: 25,
+        breakMin: 5,
+        chime: false,
+        hideFromRequests: false,
+        ...getProfile()
+      };
+
+      const nickInput = document.getElementById("me-nick");
+      const statusText = document.getElementById("me-status");
+      if (nickInput) {
+        nickInput.value = profile.name || "Reader";
+        nickInput.addEventListener("input", (e) => {
+          profile.name = e.target.value.trim().slice(0, 24);
+          saveProfile(profile);
+          if (statusText) {
+            statusText.textContent = "Saved";
+            setTimeout(() => { statusText.textContent = ""; }, 1500);
+          }
+        });
+      }
+
+      const avaWrap = document.getElementById("me-avatars");
+      if (avaWrap) {
+        AVATARS.forEach(ava => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "avatar-pick" + (profile.avatar === ava ? " on" : "");
+          btn.textContent = ava;
+          btn.addEventListener("click", () => {
+            profile.avatar = ava;
+            saveProfile(profile);
+            document.querySelectorAll(".avatar-pick").forEach(b => b.classList.remove("on"));
+            btn.classList.add("on");
+          });
+          avaWrap.appendChild(btn);
+        });
+      }
+
+      const rhythmSelect = document.getElementById("me-rhythm");
+      if (rhythmSelect) {
+        rhythmSelect.value = (profile.focusMin || 25) + "/" + (profile.breakMin || 5);
+        rhythmSelect.addEventListener("change", (e) => {
+          const parts = e.target.value.split("/").map(Number);
+          profile.focusMin = parts[0];
+          profile.breakMin = parts[1];
+          saveProfile(profile);
+        });
+      }
+
+      const chimeCheck = document.getElementById("me-chime");
+      if (chimeCheck) {
+        chimeCheck.checked = !profile.chime;
+        chimeCheck.addEventListener("change", (e) => {
+          profile.chime = e.target.checked;
+          saveProfile(profile);
+        });
+      }
+
+      const hideCheck = document.getElementById("me-hide");
+      if (hideCheck) {
+        hideCheck.checked = !profile.hideFromRequests;
+        hideCheck.addEventListener("change", (e) => {
+          profile.hideFromRequests = e.target.checked;
+          saveProfile(profile);
+        });
+      }
+
+      // Stats
+      const history = getHistory();
+      const weekAgo = Date.now() - 7 * 86400000;
+      const weekSittings = history.filter(s => s.at >= weekAgo);
+      const weekMins = weekSittings.reduce((acc, s) => acc + (s.minutes || 0), 0);
+      const weekDays = new Set(weekSittings.map(s => new Date(s.at).toDateString())).size;
+
+      document.getElementById("stat-week").textContent = "This week: " + Math.floor(weekMins / 60) + " h " + (weekMins % 60) + " min across " + weekDays + " " + (weekDays === 1 ? "day" : "days") + ".";
+
+      const allMins = history.reduce((acc, s) => acc + (s.minutes || 0), 0);
+      const allDays = new Set(history.map(s => new Date(s.at).toDateString())).size;
+      document.getElementById("stat-alltime").textContent = "All time: " + Math.floor(allMins / 60) + " h " + (allMins % 60) + " min over " + allDays + " " + (allDays === 1 ? "day" : "days") + " of showing up.";
+
+      // Usual Seats
+      try {
+        const u = JSON.parse(localStorage.getItem(USUAL_SEATS_KEY) || "{}");
+        if (u["main-reading"]) document.getElementById("seat-main").textContent = "Desk " + u["main-reading"];
+        if (u["science-wing"]) document.getElementById("seat-science").textContent = "Desk " + u["science-wing"];
+        if (u["exam-season"]) document.getElementById("seat-exam").textContent = "Desk " + u["exam-season"];
+        if (u["night-owls"]) document.getElementById("seat-night").textContent = "Desk " + u["night-owls"];
+      } catch (e) {}
+
+      // Sittings List
+      const historyList = document.getElementById("full-history-list");
+      if (historyList && history.length > 0) {
+        historyList.innerHTML = "";
+        history.slice(0, 30).forEach(s => {
+          const li = document.createElement("li");
+          const dateStr = new Date(s.at).toLocaleDateString();
+          li.textContent = dateStr + " · " + (s.hallId || "Hall") + " · Desk " + (s.seat || "-") + " · " + s.minutes + " min on \"" + (s.topic || "Focus session") + "\"" + (s.note ? " — “" + s.note + "”" : "");
+          historyList.appendChild(li);
+        });
+      }
+
+      // Delete Data logic
+      const confirmInput = document.getElementById("del-confirm");
+      const delBtn = document.getElementById("del-btn");
+      if (confirmInput && delBtn) {
+        confirmInput.addEventListener("input", (e) => {
+          delBtn.disabled = e.target.value.trim() !== "DELETE";
+        });
+        delBtn.addEventListener("click", () => {
+          if (confirmInput.value.trim() === "DELETE") {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert("All your Hush Hall data and history has been cleared.");
+            window.location.href = "/";
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

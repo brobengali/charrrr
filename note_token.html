@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f6efe2"/>
+  <title>Shared note · Hush Hall</title>
+  <meta name="description" content="Take a desk, write your topic, study quietly next to others."/>
+  <link rel="stylesheet" href="/style.css"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+</head>
+<body>
+  <header class="topbar">
+    <a href="/" class="brand">Hush Hall</a>
+    <span class="tagline">a quiet virtual library</span>
+  </header>
+  <main>
+    <article class="card prose narrow" id="note-card">
+      <h1 id="note-title">This note isn’t available</h1>
+      <p class="muted" id="note-body">The link may have been stopped, or it isn’t a Hush Hall share link.</p>
+      <div id="note-meta" class="small muted" style="margin-top:16px;display:none;"></div>
+      <p class="small muted" style="margin-top:24px"><a href="/">Hush Hall</a></p>
+    </article>
+  </main>
+  <script>
+    (function() {
+      try {
+        const parts = window.location.pathname.split('/');
+        const token = parts[parts.length - 1] || parts[parts.length - 2];
+        if (token) {
+          const notes = JSON.parse(localStorage.getItem('hh.notes') || '[]');
+          const note = notes.find(n => n.token === token || n.id === token);
+          if (note) {
+            document.title = (note.title || 'Desk note') + ' · Hush Hall';
+            document.getElementById('note-title').textContent = note.title || 'Desk note';
+            document.getElementById('note-body').textContent = note.body || note.content || '';
+            const meta = document.getElementById('note-meta');
+            meta.style.display = 'block';
+            meta.textContent = 'Written ' + (note.at ? new Date(note.at).toLocaleDateString() : 'recently');
+          }
+        }
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>
