@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6efe2" />
+  <title>Hush Hall · A Quiet Virtual Library</title>
+  <link rel="icon" type="image/x-icon" href="/assets/favicon-_ZmbRfoM.ico" />
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon-DPZwm-Rt.png" />
+  <link rel="manifest" href="/assets/manifest-bfHKEL_j.webmanifest" />
+  <script type="module" crossorigin src="/assets/index-bddgjozt.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BDbma1ED.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand">
+        <span class="brand-icon">🏛️</span>
+        <span class="brand-title">Hush Hall</span>
+      </div>
+      <div class="room-selector-wrap">
+        <select id="room-selector" class="room-select" aria-label="Select study hall">
+          <option value="main-reading" selected>Main Reading Hall</option>
+          <option value="science-wing">Science Wing</option>
+          <option value="exam-season">Exam Season Hall</option>
+          <option value="night-owls">Night Owls Hall</option>
+        </select>
+        <span id="room-mood" class="room-mood">Big, quiet, long tables</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button id="btn-toggle-rain" class="header-btn" title="Toggle soothing rain soundscape">
+        <span id="rain-icon">🌧</span> Rain: <span id="rain-status">Off</span>
+      </button>
+      <button id="btn-toggle-view" class="header-btn primary-toggle" title="Switch between 3D hall and 2D floor view">
+        Simple 2D View
+      </button>
+      <a href="/rules" target="_blank" class="header-link">House rules</a>
+      <a href="/privacy" target="_blank" class="header-link">Privacy</a>
+    </div>
+  </header>
+
+  <!-- Main Viewport Wrap -->
+  <main class="main-viewport">
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Atmospheric Vignette Overlay -->
+    <div class="vignette"></div>
+
+    <!-- 3D Frame Controls (Top Left) -->
+    <div class="ui-top-left">
+      <button id="btn-walk" class="pill-btn">Walk around</button>
+      <button id="btn-wardrobe" class="pill-btn">Wardrobe</button>
+      <button id="btn-fullscreen" class="pill-btn">Full screen</button>
+    </div>
+
+    <!-- Bottom Left Zoom Controls -->
+    <div class="ui-bottom-left">
+      <button id="btn-zoom-in" class="zoom-btn" title="Zoom in">+</button>
+      <button id="btn-zoom-out" class="zoom-btn" title="Zoom out">−</button>
+    </div>
+
+    <!-- Bottom Center Hint Pill -->
+    <div class="ui-bottom-center">
+      <div id="hint-pill" class="hint-pill">
+        Tap a free desk to sit, or someone's desk to see their topic.
+      </div>
+    </div>
+
+    <!-- First-Person Crosshair -->
+    <div id="crosshair" class="crosshair" style="display: none;"></div>
+
+    <!-- 2D Simple Floor Plan View (Toggled via header) -->
+    <div id="floor-view-2d" class="floor-2d-overlay" style="display: none;">
+      <div class="floor-2d-card">
+        <div class="floor-2d-header">
+          <h2>Simple 2D Floor Plan</h2>
+          <span id="desks-count-badge" class="badge">8 Desks</span>
+        </div>
+        <p class="floor-2d-sub">Select any vacant desk to take your seat, or tap an occupied desk to inspect their topic.</p>
+        <div id="desks-grid-2d" class="desks-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Focus Bar (Pomodoro Timer & Desk Actions) -->
+  <footer id="focusbar" class="focusbar">
+    <div class="focus-left">
+      <div id="timer-display" class="timer-digits">25:00</div>
+      <div class="focus-topic-wrap">
+        <span class="focus-label">Topic</span>
+        <span id="current-topic-label" class="current-topic">None (Pick a desk to sit)</span>
+      </div>
+    </div>
+
+    <div class="focus-right">
+      <button id="btn-timer-action" class="focus-btn primary-action">Start focus</button>
+      <button id="btn-open-notes" class="focus-btn">Notes</button>
+      <button id="btn-open-hours" class="focus-btn">Hours</button>
+      <button id="btn-stand-up" class="focus-btn danger-action" style="display: none;">Stand up</button>
+    </div>
+  </footer>
+
+  <!-- Modal: Sit at Desk -->
+  <div id="sit-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <button class="close-btn" data-close="sit-modal" aria-label="Close">&times;</button>
+      <div class="modal-title-row">
+        <h3 id="sit-modal-title">Take Desk A1</h3>
+        <span class="badge">Library Seat</span>
+      </div>
+      <p class="modal-sub">Write what you are working on. Others in the hall will only see your topic and avatar.</p>
+
+      <div class="form-group">
+        <label for="input-study-topic">What are you studying or working on?</label>
+        <input type="text" id="input-study-topic" class="text-input" placeholder="e.g. Chapter 4 problem set, thesis revision..." maxlength="80" autofocus />
+      </div>
+
+      <div class="modal-btn-row">
+        <button id="btn-confirm-sit" class="primary-btn">Take seat & start studying</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Study Topic Card -->
+  <div id="topic-modal" class="modal-backdrop" style="display: none;">
+    <div class="topic-card">
+      <button class="close-btn" data-close="topic-modal" aria-label="Close">&times;</button>
+      <div class="topic-header">
+        <div id="topic-avatar" class="topic-avatar">📖</div>
+        <div>
+          <h3 id="topic-name">Reader</h3>
+          <span id="topic-seat" class="seat-badge">Desk A1</span>
+        </div>
+      </div>
+      <div class="topic-divider"></div>
+      <div class="topic-label">Currently Studying</div>
+      <div id="topic-text" class="topic-body">Organic Chemistry: SN1 vs SN2 Mechanisms</div>
+    </div>
+  </div>
+
+  <!-- Modal: Wardrobe Customizer -->
+  <div id="wardrobe-modal" class="modal-backdrop" style="display: none;">
+    <div class="wardrobe-panel">
+      <button class="close-btn" data-close="wardrobe-modal" aria-label="Close">&times;</button>
+      <h2>Wardrobe</h2>
+      <p class="wardrobe-subtitle">Customize your avatar's appearance in the library hall.</p>
+
+      <div class="wardrobe-section">
+        <label>Shirt Color</label>
+        <div id="shirt-swatches" class="color-swatches"></div>
+      </div>
+
+      <div class="wardrobe-section">
+        <label>Hair Color</label>
+        <div id="hair-swatches" class="color-swatches"></div>
+      </div>
+
+      <button id="wardrobe-done" class="primary-btn">Save & Close</button>
+    </div>
+  </div>
+
+  <!-- Modal: Desk Notes Scratchpad -->
+  <div id="notes-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card wide">
+      <button class="close-btn" data-close="notes-modal" aria-label="Close">&times;</button>
+      <div class="modal-title-row">
+        <h3>Desk Scratchpad Notes</h3>
+        <span class="badge">Private to your browser</span>
+      </div>
+      <p class="modal-sub">Jot down reference links, formula reminders, and to-do items while you study.</p>
+      <textarea id="notes-textarea" class="notes-input" placeholder="Type study notes here... auto-saved to localStorage"></textarea>
+      <div class="modal-btn-row">
+        <button id="btn-save-notes" class="primary-btn">Save notes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Weekly Hours -->
+  <div id="hours-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <button class="close-btn" data-close="hours-modal" aria-label="Close">&times;</button>
+      <div class="modal-title-row">
+        <h3>Weekly Study Log</h3>
+        <span id="hours-total-badge" class="badge">0 hrs this week</span>
+      </div>
+      <p class="modal-sub">Quiet, focused minutes logged in Hush Hall over the past 7 days.</p>
+      <div id="hours-log-list" class="hours-list">
+        <div class="empty-state">No sessions logged yet. Complete a 25-minute focus round to log hours!</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

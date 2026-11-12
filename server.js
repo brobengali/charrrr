@@ -1,7 +1,11 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const url = require('url');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Port resolution: CLI argument (e.g. `node server.js 8080` or `--port 8080`) > PORT env var > default 8080
 function getPort() {
@@ -33,13 +37,14 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
   '.webmanifest': 'application/manifest+json',
-  '.vrm': 'model/gltf-binary',
-  '.glb': 'model/gltf-binary',
-  '.gltf': 'model/gltf+json',
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
   '.ttf': 'font/ttf'
 };
+
+const distDir = path.join(__dirname, 'dist');
+const useDist = fs.existsSync(distDir) && fs.existsSync(path.join(distDir, 'index.html'));
+const baseDir = useDist ? distDir : __dirname;
 
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
@@ -76,14 +81,14 @@ const server = http.createServer((req, res) => {
   }
 
   // Resolve file path
-  let filePath = path.join(__dirname, pathname);
+  let filePath = path.join(baseDir, pathname);
 
   // Check if direct file exists
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
     return serveFile(filePath, res);
   }
 
-  // If path is a directory or path without extension, check for index.html or route.html
+  // If path is a directory or path without extension, check for index.html
   if (fs.existsSync(path.join(filePath, 'index.html'))) {
     return serveFile(path.join(filePath, 'index.html'), res);
   }
@@ -92,25 +97,17 @@ const server = http.createServer((req, res) => {
     return serveFile(filePath + '.html', res);
   }
 
-  // Dynamic route matches
-  if (pathname.startsWith('/hall/')) {
-    const hallId = pathname.replace('/hall/', '').replace(/\/$/, '');
-    const specificHall = path.join(__dirname, 'hall', hallId, 'index.html');
-    if (fs.existsSync(specificHall)) {
-      return serveFile(specificHall, res);
-    }
-    return serveFile(path.join(__dirname, 'hall', 'main-reading', 'index.html'), res);
-  }
-
-  if (pathname.startsWith('/n/')) {
-    if (fs.existsSync(path.join(__dirname, 'note_token.html'))) {
-      return serveFile(path.join(__dirname, 'note_token.html'), res);
+  // Also check workspace root if using dist
+  if (useDist) {
+    const rootPath = path.join(__dirname, pathname);
+    if (fs.existsSync(rootPath) && fs.statSync(rootPath).isFile()) {
+      return serveFile(rootPath, res);
     }
   }
 
-  // 404 fallback to index.html
-  if (fs.existsSync(path.join(__dirname, 'index.html'))) {
-    return serveFile(path.join(__dirname, 'index.html'), res);
+  // Fallback to index.html for client-side routing
+  if (fs.existsSync(path.join(baseDir, 'index.html'))) {
+    return serveFile(path.join(baseDir, 'index.html'), res);
   }
 
   res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -139,4 +136,3 @@ server.listen(PORT, () => {
   console.log(`\n  Hush Hall · a quiet virtual library`);
   console.log(`  > Local:   http://localhost:${PORT}/\n`);
 });
-
