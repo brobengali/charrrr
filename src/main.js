@@ -22,10 +22,10 @@ function initApp() {
   // 2. Lighting Setup (Hemisphere, warm PointLights, soft shadows)
   setupLighting(scene);
 
-  // 3. Library Room (Hardwood plank floor, dark wood walls, big green rug, potted plants, sconces)
-  buildLibraryRoom(scene);
+  // 3. Library Room & 3D Audiobook Listening Lounge Station
+  const libraryAPI = buildLibraryRoom(scene);
 
-  // 4. Bookshelves with Attached Genre Plaques & Procedural Books via InstancedMesh
+  // 4. Bookshelves with Locked Glass Cabinets & Procedural Books via InstancedMesh
   const booksAPI = buildBookshelves(scene);
 
   // 5. Arched Windows with Rainy Night Sky & Sliding Droplets
@@ -37,8 +37,8 @@ function initApp() {
   // 7. Controls (OrbitControls default + PointerLock first-person walk mode)
   const controls = setupControls(camera, renderer, renderer.domElement);
 
-  // 8. User Interface & Raycast Interaction (Seats & Bookshelf Genres)
-  setupUI(camera, scene, renderer.domElement, controls, furnitureAPI, booksAPI);
+  // 8. User Interface & Raycast Interaction (Seats, Bookshelves & Audiobook Lounge)
+  setupUI(camera, scene, renderer.domElement, controls, furnitureAPI, booksAPI, libraryAPI);
 
   // 9. Main Animation Loop
   const clock = new THREE.Clock();

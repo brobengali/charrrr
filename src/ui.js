@@ -2,16 +2,17 @@ import * as THREE from 'three';
 import { playFocusChime, toggleRainSound } from './audio.js';
 import { StudySession } from './timer.js';
 import { getBookAffiliateLink } from './books.js';
+import { AUDIOBOOK_GENRES, getAudiobookAffiliateLink, getAudibleDirectLink } from './audiobooks.js';
 
 // Room Moods & Descriptions
 const ROOM_INFO = {
-  'main-reading': { name: 'Grand Study Cafe', mood: '56 tables · face-to-face seating · curated genre shelves' },
+  'main-reading': { name: 'Grand Study Cafe', mood: '56 tables · face-to-face seating · curated genre shelves & audiobook lounge' },
   'science-wing': { name: 'Executive Work Lounge', mood: 'Quiet analysis · coffee roasts · strategy decks' },
   'exam-season': { name: 'High-Focus Library Cafe', mood: 'Deadlines · deep problem sets · quiet laptops' },
   'night-owls': { name: 'Midnight Espresso Hall', mood: 'Late-night steam · dim lamps · calm focus' }
 };
 
-export function setupUI(camera, scene, domElement, controls, furnitureAPI, booksAPI = null) {
+export function setupUI(camera, scene, domElement, controls, furnitureAPI, booksAPI = null, libraryAPI = null) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2(-999, -999);
 
@@ -62,6 +63,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
 
   const btnWalk = document.getElementById('btn-walk');
   const btnWardrobe = document.getElementById('btn-wardrobe');
+  const btnAudiobooks = document.getElementById('btn-audiobooks');
   const btnFullscreen = document.getElementById('btn-fullscreen');
   const btnZoomIn = document.getElementById('btn-zoom-in');
   const btnZoomOut = document.getElementById('btn-zoom-out');
@@ -96,6 +98,11 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   const genreBookList = document.getElementById('genre-book-list');
   const btnReadGenreBook = document.getElementById('btn-read-genre-book');
   let activeGenreData = null;
+
+  // Audiobook Section Modal
+  const audiobookModal = document.getElementById('audiobook-modal');
+  const audiobookGenreTabs = document.getElementById('audiobook-genre-tabs');
+  const audiobookList = document.getElementById('audiobook-list');
 
   const wardrobeModal = document.getElementById('wardrobe-modal');
   const suitSwatches = document.getElementById('suit-swatches');
@@ -429,7 +436,116 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     });
   }
 
-  // 13. Wardrobe Modal (Formal Office Attire)
+  // 13. Dedicated Audiobook Listening Lounge & Multi-Genre Archive
+  let currentAudiobookGenre = 'all';
+
+  function showAudiobookModal(genreId = 'all') {
+    currentAudiobookGenre = genreId;
+    renderAudiobookGenreTabs();
+    renderAudiobookList();
+    if (audiobookModal) {
+      audiobookModal.style.display = 'flex';
+    }
+  }
+
+  function renderAudiobookGenreTabs() {
+    if (!audiobookGenreTabs) return;
+    audiobookGenreTabs.innerHTML = '';
+
+    const tabs = [
+      { id: 'all', name: 'All Curated Genres', icon: '🎧' },
+      ...AUDIOBOOK_GENRES.map(g => ({ id: g.id, name: g.name, icon: g.icon }))
+    ];
+
+    tabs.forEach(tab => {
+      const btn = document.createElement('button');
+      btn.className = `audiobook-tab ${currentAudiobookGenre === tab.id ? 'active' : ''}`;
+      btn.innerHTML = `<span>${tab.icon}</span> <span>${tab.name}</span>`;
+      btn.addEventListener('click', () => {
+        currentAudiobookGenre = tab.id;
+        renderAudiobookGenreTabs();
+        renderAudiobookList();
+      });
+      audiobookGenreTabs.appendChild(btn);
+    });
+  }
+
+  function renderAudiobookList() {
+    if (!audiobookList) return;
+    audiobookList.innerHTML = '';
+
+    let displayedBooks = [];
+    if (currentAudiobookGenre === 'all') {
+      AUDIOBOOK_GENRES.forEach(g => {
+        g.audiobooks.forEach(b => {
+          displayedBooks.push({ ...b, genreName: g.name, genreIcon: g.icon });
+        });
+      });
+    } else {
+      const targetGenre = AUDIOBOOK_GENRES.find(g => g.id === currentAudiobookGenre);
+      if (targetGenre) {
+        displayedBooks = targetGenre.audiobooks.map(b => ({
+          ...b,
+          genreName: targetGenre.name,
+          genreIcon: targetGenre.icon
+        }));
+      }
+    }
+
+    displayedBooks.forEach(book => {
+      const affiliateLink = getAudiobookAffiliateLink(book.title, book.author);
+      const audibleLink = getAudibleDirectLink(book.title, book.author);
+
+      const card = document.createElement('div');
+      card.className = 'audiobook-card';
+      card.innerHTML = `
+        <div class="audiobook-card-header">
+          <div class="audiobook-badge" style="background:${book.coverColor || '#1c2838'};">
+            <span class="audio-waves">
+              <span></span><span></span><span></span><span></span>
+            </span>
+            <span class="ab-icon">🎧</span>
+          </div>
+          <div class="audiobook-meta">
+            <div class="audiobook-genre-tag">${book.genreIcon} ${book.genreName}</div>
+            <h4 class="audiobook-title">${book.title}</h4>
+            <div class="audiobook-author">by <b>${book.author}</b></div>
+            <div class="audiobook-credits">
+              <span>🎙️ ${book.narrator}</span>
+              <span>⏱️ ${book.duration}</span>
+            </div>
+          </div>
+        </div>
+        <p class="audiobook-tagline">“${book.tagline}”</p>
+        <div class="audiobook-actions">
+          <button class="audio-study-btn" title="Set this audiobook as your current study topic">
+            Set as Focus Audio
+          </button>
+          <a href="${affiliateLink}" target="_blank" rel="noopener noreferrer" class="audio-listen-btn primary-audible" title="Run & listen to audiobook on Amazon Audible">
+            Listen on Audible 🎧
+          </a>
+          <a href="${audibleLink}" target="_blank" rel="noopener noreferrer" class="audio-listen-btn outline-audible" title="Search in Audible Store">
+            Audible App ↗
+          </a>
+        </div>
+      `;
+
+      card.querySelector('.audio-study-btn').addEventListener('click', () => {
+        audiobookModal.style.display = 'none';
+        applyBookTopic(`${book.title} (Audiobook) — ${book.author}`, book.genreName);
+      });
+
+      audiobookList.appendChild(card);
+    });
+  }
+
+  if (btnAudiobooks) {
+    btnAudiobooks.addEventListener('click', () => {
+      showAudiobookModal('all');
+    });
+  }
+
+  // 14. Wardrobe Modal (Formal Office Attire)
   function buildSwatches(container, colors, selectedColor, onSelect) {
     if (!container) return;
     container.innerHTML = '';
@@ -512,11 +628,17 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     });
   });
 
-  // 17. Raycast Interaction (Desks & Bookshelf Genres)
-  const getAllClickables = () => [
-    ...furnitureAPI.deskClickables,
-    ...(booksAPI?.shelfClickables || [])
-  ];
+  // 17. Raycast Interaction (Desks, Locked Cabinets & 3D Audiobook Station)
+  const getAllClickables = () => {
+    const list = [
+      ...furnitureAPI.deskClickables,
+      ...(booksAPI?.shelfClickables || [])
+    ];
+    if (libraryAPI?.audioHitBox) {
+      list.push(libraryAPI.audioHitBox);
+    }
+    return list;
+  };
 
   domElement.addEventListener('pointermove', e => {
     const rect = domElement.getBoundingClientRect();
@@ -541,7 +663,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
       const hit = hits[0].object;
       const data = hit.userData;
 
-      if (data.isShelf) {
+      if (data.isAudiobookStation) {
+        showAudiobookModal('all');
+      } else if (data.isShelf) {
         showGenreModal(data.genreData);
       } else if (data.occupied) {
         showTopicModal(data.studentData, data.seatId, data.tableId, data.side);
@@ -554,6 +678,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   return {
     session,
     showTopicModal,
-    showGenreModal
+    showGenreModal,
+    showAudiobookModal
   };
 }

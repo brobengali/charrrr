@@ -363,8 +363,8 @@ export function buildLibraryRoom(scene) {
     new THREE.Vector3(ROOM.maxX - 1.2, 0, ROOM.maxZ - 1.2),
     new THREE.Vector3(-5.2, 0, -12.5),
     new THREE.Vector3(5.2, 0, -12.5),
-    new THREE.Vector3(-1.8, 0, 13.5),
-    new THREE.Vector3(1.8, 0, 13.5),
+    new THREE.Vector3(-2.8, 0, 13.2), // Flanking Audiobook Lounge
+    new THREE.Vector3(2.8, 0, 13.2),  // Flanking Audiobook Lounge
     new THREE.Vector3(ROOM.minX + 1.2, 0, 0),
     new THREE.Vector3(ROOM.maxX - 1.2, 0, 0)
   ];
@@ -374,11 +374,130 @@ export function buildLibraryRoom(scene) {
     roomGroup.add(plant);
   });
 
+  // 8. Dedicated 3D Audiobook Listening Lounge Station
+  const audioStationGroup = new THREE.Group();
+  const stationX = 0;
+  const stationZ = 13.2;
+
+  // Acoustic Fluted Walnut Console Base
+  const consoleBase = new THREE.Mesh(
+    new THREE.BoxGeometry(4.4, 1.05, 1.3),
+    wallWoodMat
+  );
+  consoleBase.position.set(stationX, 0.525, stationZ);
+  consoleBase.castShadow = true;
+  consoleBase.receiveShadow = true;
+  audioStationGroup.add(consoleBase);
+
+  // Polished Marble & Brass Countertop
+  const consoleTop = new THREE.Mesh(
+    new THREE.BoxGeometry(4.6, 0.08, 1.45),
+    marbleMat
+  );
+  consoleTop.position.set(stationX, 1.09, stationZ);
+  consoleTop.castShadow = true;
+  consoleTop.receiveShadow = true;
+  audioStationGroup.add(consoleTop);
+
+  // Audio Turntable / Master Console unit
+  const audioUnit = new THREE.Mesh(
+    new THREE.BoxGeometry(1.0, 0.12, 0.6),
+    new THREE.MeshStandardMaterial({ color: '#2b231d', metalness: 0.7, roughness: 0.3, flatShading: true })
+  );
+  audioUnit.position.set(stationX, 1.18, stationZ);
+  audioStationGroup.add(audioUnit);
+
+  // Glowing VU Meter Display on Audio Console
+  const meterMat = new THREE.MeshBasicMaterial({ color: '#ffb347' });
+  const meter = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.08), meterMat);
+  meter.position.set(stationX, 1.25, stationZ + 0.28);
+  meter.rotation.x = -Math.PI / 6;
+  audioStationGroup.add(meter);
+
+  // Two Brass Headphone Stands with Studio Over-Ear Headphones
+  [-1.2, 1.2].forEach(hx => {
+    // Stand
+    const standBase = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.03, 10), brassMat);
+    standBase.position.set(stationX + hx, 1.14, stationZ);
+    audioStationGroup.add(standBase);
+
+    const standStem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.34, 6), brassMat);
+    standStem.position.set(stationX + hx, 1.31, stationZ);
+    audioStationGroup.add(standStem);
+
+    const standTop = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.012, 6, 12, Math.PI), brassMat);
+    standTop.position.set(stationX + hx, 1.48, stationZ);
+    audioStationGroup.add(standTop);
+
+    // Headphones (Black leather ear-cups + brass headband)
+    const hpMat = new THREE.MeshStandardMaterial({ color: '#1a1816', roughness: 0.6, metalness: 0.3, flatShading: true });
+    [-0.08, 0.08].forEach(side => {
+      const earCup = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.04, 10), hpMat);
+      earCup.rotation.z = Math.PI / 2;
+      earCup.position.set(stationX + hx + side, 1.44, stationZ);
+      audioStationGroup.add(earCup);
+    });
+  });
+
+  // Overhead Illuminated Glass Sign: "🎧 AUDIOBOOK LOUNGE · AUDIBLE ARCHIVE"
+  const signCanvas = document.createElement('canvas');
+  signCanvas.width = 1024;
+  signCanvas.height = 256;
+  const sCtx = signCanvas.getContext('2d');
+  sCtx.clearRect(0, 0, 1024, 256);
+  sCtx.fillStyle = 'rgba(26, 18, 12, 0.88)';
+  if (sCtx.roundRect) {
+    sCtx.roundRect(40, 30, 944, 196, 24);
+    sCtx.fill();
+  } else {
+    sCtx.fillRect(40, 30, 944, 196);
+  }
+  sCtx.strokeStyle = '#deb358';
+  sCtx.lineWidth = 6;
+  sCtx.strokeRect(52, 42, 920, 172);
+  sCtx.fillStyle = '#ffdf99';
+  sCtx.font = 'bold 36px Georgia, serif';
+  sCtx.textAlign = 'center';
+  sCtx.textBaseline = 'middle';
+  sCtx.fillText('🎧 AUDIOBOOK LOUNGE · AUDIBLE ARCHIVE', 512, 104);
+  sCtx.fillStyle = '#dfcaa0';
+  sCtx.font = '22px system-ui, sans-serif';
+  sCtx.fillText('TAP TO BROWSE AUDIOBOOKS BY GENRE & LISTEN ON AUDIBLE', 512, 162);
+
+  const signTex = new THREE.CanvasTexture(signCanvas);
+  signTex.colorSpace = THREE.SRGBColorSpace;
+  const signMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.0, 1.0),
+    new THREE.MeshBasicMaterial({ map: signTex, transparent: true, opacity: 0.98 })
+  );
+  signMesh.position.set(stationX, 2.6, stationZ - 0.1);
+  signMesh.rotation.y = 0; // Face into the hall
+  audioStationGroup.add(signMesh);
+
+  // Brass support poles from console to sign
+  [-1.6, 1.6].forEach(px => {
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 1.7, 6), brassMat);
+    pole.position.set(stationX + px, 1.9, stationZ);
+    audioStationGroup.add(pole);
+  });
+
+  // Invisible Clickable Hitbox for Raycasting the Audiobook Lounge
+  const audioHitBox = new THREE.Mesh(
+    new THREE.BoxGeometry(4.8, 2.8, 2.2),
+    new THREE.MeshBasicMaterial({ visible: false })
+  );
+  audioHitBox.position.set(stationX, 1.4, stationZ);
+  audioHitBox.userData = { isAudiobookStation: true };
+  audioStationGroup.add(audioHitBox);
+
+  roomGroup.add(audioStationGroup);
+
   scene.add(roomGroup);
 
   return {
     ROOM,
-    roomGroup
+    roomGroup,
+    audioHitBox
   };
 }
 
