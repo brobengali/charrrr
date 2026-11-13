@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { AUDIOBOOK_GENRES } from './audiobooks.js';
 
 // Muted Palette Colors for Books
 const BOOK_PALETTE = [
@@ -376,6 +377,74 @@ function createGlassGenreCanvasTexture(title, icon = '✦') {
   return texture;
 }
 
+// Helper: Create an illuminated canvas texture for the 3D Headphone Racks
+function createHeadphoneRackGlassTexture(genre) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 384;
+  const ctx = canvas.getContext('2d');
+
+  ctx.clearRect(0, 0, 1024, 384);
+
+  // Deep amber-smoked glass background for rich contrast
+  ctx.fillStyle = 'rgba(20, 15, 12, 0.94)';
+  if (ctx.roundRect) {
+    ctx.roundRect(24, 24, 976, 336, 20);
+    ctx.fill();
+  } else {
+    ctx.fillRect(24, 24, 976, 336);
+  }
+
+  // Outer gold frame
+  ctx.strokeStyle = '#deb358';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(36, 36, 952, 312);
+
+  // Inner subtle gold filigree
+  ctx.strokeStyle = 'rgba(255, 223, 140, 0.6)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(48, 48, 928, 288);
+
+  // Four corner brass rosettes
+  const corners = [
+    [52, 52], [972, 52], [52, 332], [972, 332]
+  ];
+  corners.forEach(([cx, cy]) => {
+    ctx.fillStyle = '#ffdf85';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Top Badge: 🎧 HEADPHONE RACK · AUDIBLE ARCHIVE
+  ctx.fillStyle = '#ffdd99';
+  ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🎧 HEADPHONE RACK · AUDIBLE ARCHIVE', 512, 95);
+
+  // CLEAR BIG GENRE TITLE
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 50px Georgia, "Times New Roman", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 4;
+  ctx.fillText(genre.name.toUpperCase(), 512, 185);
+
+  // Subline with icon & runnable prompt
+  ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#dfb564';
+  ctx.font = '22px Georgia, serif';
+  ctx.fillText(`— ${genre.icon} ${genre.audiobooks.length} RUNNABLE AUDIOBOOKS · TAP TO LISTEN ${genre.icon} —`, 512, 270);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 export function buildBookshelves(scene) {
   // Rich Walnut Wood for Cabinet Frame
   const shelfWoodMat = new THREE.MeshStandardMaterial({
@@ -586,6 +655,298 @@ export function buildBookshelves(scene) {
     scene.add(group);
   }
 
+  // Helper to build a 3D Multi-Tier Headphone Rack for Audiobooks (categorized by genre)
+  function createHeadphoneRack(genre, x, y, z, rotY = 0, width = 2.6, height = 4.6, depth = 0.52) {
+    const group = new THREE.Group();
+    group.position.set(x, y, z);
+    group.rotation.y = rotY;
+
+    // 1. Solid Fluted Walnut Uprights (Left & Right Side Pillars)
+    const uprightW = 0.12;
+    [-width / 2 + uprightW / 2, width / 2 - uprightW / 2].forEach(ux => {
+      // Wood pillar
+      const pillar = new THREE.Mesh(
+        new THREE.BoxGeometry(uprightW, height, depth),
+        shelfWoodMat
+      );
+      pillar.position.set(ux, height / 2, 0);
+      pillar.castShadow = true;
+      pillar.receiveShadow = true;
+      group.add(pillar);
+
+      // Brass Base Foot & Brass Capital
+      const foot = new THREE.Mesh(new THREE.BoxGeometry(uprightW + 0.03, 0.12, depth + 0.03), brassLockMat);
+      foot.position.set(ux, 0.06, 0);
+      group.add(foot);
+
+      const capital = new THREE.Mesh(new THREE.BoxGeometry(uprightW + 0.03, 0.1, depth + 0.03), brassLockMat);
+      capital.position.set(ux, height - 0.05, 0);
+      group.add(capital);
+    });
+
+    // 2. Base Plinth & Top Cornice
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(width, 0.16, depth + 0.04), shelfWoodMat);
+    plinth.position.set(0, 0.08, 0);
+    group.add(plinth);
+
+    const cornice = new THREE.Mesh(new THREE.BoxGeometry(width + 0.06, 0.14, depth + 0.06), shelfWoodMat);
+    cornice.position.set(0, height - 0.07, 0);
+    group.add(cornice);
+
+    const brassFrieze = new THREE.Mesh(new THREE.BoxGeometry(width + 0.04, 0.03, depth + 0.07), brassLockMat);
+    brassFrieze.position.set(0, height - 0.155, 0);
+    group.add(brassFrieze);
+
+    // 3. Acoustic Slatted Walnut Back Wall
+    const backPanel = new THREE.Mesh(
+      new THREE.BoxGeometry(width - 0.24, height - 0.2, 0.03),
+      shelfBackMat
+    );
+    backPanel.position.set(0, height / 2, -depth / 2 + 0.025);
+    group.add(backPanel);
+
+    // Vertical Acoustic Timber Slats
+    const slatCount = 14;
+    const slatW = 0.035;
+    const slatSpacing = (width - 0.32) / slatCount;
+    for (let i = 0; i < slatCount; i++) {
+      const sx = -width / 2 + 0.2 + i * slatSpacing;
+      const slat = new THREE.Mesh(
+        new THREE.BoxGeometry(slatW, height - 0.3, 0.015),
+        shelfWoodMat
+      );
+      slat.position.set(sx, height / 2, -depth / 2 + 0.045);
+      group.add(slat);
+    }
+
+    // 4. LOWER SECTION: Hi-Fi Analog Amplifier / Master Audio Console
+    const consoleW = width - 0.26;
+    const consoleH = 0.72;
+    const consoleY = 0.16 + consoleH / 2;
+    const consoleZ = -depth / 2 + 0.24;
+
+    const consoleBody = new THREE.Mesh(
+      new THREE.BoxGeometry(consoleW, consoleH, 0.38),
+      new THREE.MeshStandardMaterial({ color: '#201a16', roughness: 0.6, metalness: 0.4, flatShading: true })
+    );
+    consoleBody.position.set(0, consoleY, consoleZ);
+    group.add(consoleBody);
+
+    // Brushed Dark Faceplate
+    const faceplate = new THREE.Mesh(
+      new THREE.BoxGeometry(consoleW - 0.04, consoleH - 0.08, 0.02),
+      new THREE.MeshStandardMaterial({ color: '#161311', roughness: 0.35, metalness: 0.75, flatShading: true })
+    );
+    faceplate.position.set(0, consoleY, consoleZ + 0.195);
+    group.add(faceplate);
+
+    // Dual Glowing Backlit VU Meters
+    const vuMeterMat = new THREE.MeshBasicMaterial({ color: '#ffb347' });
+    [-0.38, 0.38].forEach(vx => {
+      const vu = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.14), vuMeterMat);
+      vu.position.set(vx, consoleY + 0.12, consoleZ + 0.21);
+      group.add(vu);
+
+      const vuFrame = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.01), brassLockMat);
+      vuFrame.position.set(vx, consoleY + 0.12, consoleZ + 0.205);
+      group.add(vuFrame);
+    });
+
+    // Rotary Stepped Brass Knobs & Volume Attenuators
+    [-0.7, -0.15, 0.15, 0.7].forEach(kx => {
+      const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 12), brassLockMat);
+      knob.rotation.x = Math.PI / 2;
+      knob.position.set(kx, consoleY - 0.12, consoleZ + 0.21);
+      group.add(knob);
+    });
+
+    // 1/4" Headphone Output Jack Ports (with Brass Bushings)
+    [-0.45, -0.3, 0.3, 0.45].forEach(jx => {
+      const jackBushing = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.015, 8), brassLockMat);
+      jackBushing.rotation.x = Math.PI / 2;
+      jackBushing.position.set(jx, consoleY - 0.18, consoleZ + 0.21);
+      group.add(jackBushing);
+
+      const jackHole = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.02, 6), new THREE.MeshBasicMaterial({ color: '#000000' }));
+      jackHole.rotation.x = Math.PI / 2;
+      jackHole.position.set(jx, consoleY - 0.18, consoleZ + 0.215);
+      group.add(jackHole);
+    });
+
+    // 5. MULTI-TIER POLISHED BRASS HANGING BARS & STUDIO HEADPHONES
+    const tierHeights = [1.38, 2.12, 2.86];
+    const hpLeatherMat = new THREE.MeshStandardMaterial({
+      color: '#1c1b1a',
+      roughness: 0.55,
+      metalness: 0.2,
+      flatShading: true
+    });
+    const hpCushionMat = new THREE.MeshStandardMaterial({
+      color: '#262422',
+      roughness: 0.7,
+      metalness: 0.1,
+      flatShading: true
+    });
+    const hpCableMat = new THREE.MeshStandardMaterial({
+      color: '#151312',
+      roughness: 0.8,
+      metalness: 0.05,
+      flatShading: true
+    });
+
+    tierHeights.forEach(tierY => {
+      // Horizontal Brass Bar
+      const rodLength = width - 0.28;
+      const rod = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.016, 0.016, rodLength, 8),
+        brassLockMat
+      );
+      rod.rotation.z = Math.PI / 2;
+      rod.position.set(0, tierY, -depth / 2 + 0.22);
+      rod.castShadow = true;
+      group.add(rod);
+
+      // Rod Wall Mounting Brackets at ends
+      [-rodLength / 2, rodLength / 2].forEach(bx => {
+        const bracket = new THREE.Mesh(
+          new THREE.BoxGeometry(0.04, 0.08, 0.08),
+          brassLockMat
+        );
+        bracket.position.set(bx, tierY, -depth / 2 + 0.18);
+        group.add(bracket);
+      });
+
+      // 4 Pairs of Studio Over-Ear Headphones on this tier
+      const hookPositions = [-0.68, -0.22, 0.22, 0.68];
+      hookPositions.forEach(hx => {
+        // Brass Hook Peg
+        const hook = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.009, 0.009, 0.12, 6),
+          brassLockMat
+        );
+        hook.rotation.x = Math.PI / 2;
+        hook.position.set(hx, tierY + 0.04, -depth / 2 + 0.26);
+        group.add(hook);
+
+        const hookTip = new THREE.Mesh(
+          new THREE.SphereGeometry(0.015, 6, 6),
+          brassLockMat
+        );
+        hookTip.position.set(hx, tierY + 0.06, -depth / 2 + 0.32);
+        group.add(hookTip);
+
+        // Headphone Group
+        const hpGroup = new THREE.Group();
+        hpGroup.position.set(hx, tierY - 0.02, -depth / 2 + 0.26);
+
+        // Arching Padded Headband (Torus)
+        const headband = new THREE.Mesh(
+          new THREE.TorusGeometry(0.11, 0.018, 6, 12, Math.PI),
+          hpLeatherMat
+        );
+        headband.position.set(0, 0, 0);
+        hpGroup.add(headband);
+
+        // Left & Right Brass Yokes & Earcups
+        [-0.105, 0.105].forEach(side => {
+          // Brass yoke slider
+          const yoke = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.005, 0.005, 0.065, 6),
+            brassLockMat
+          );
+          yoke.position.set(side, -0.04, 0);
+          hpGroup.add(yoke);
+
+          // Earcup Enclosure
+          const cup = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.05, 0.05, 0.038, 10),
+            hpLeatherMat
+          );
+          cup.rotation.z = Math.PI / 2;
+          cup.position.set(side, -0.08, 0);
+          hpGroup.add(cup);
+
+          // Earcup Brass Trim Ring
+          const cupTrim = new THREE.Mesh(
+            new THREE.TorusGeometry(0.05, 0.005, 4, 10),
+            brassLockMat
+          );
+          cupTrim.rotation.y = Math.PI / 2;
+          cupTrim.position.set(side + (side > 0 ? -0.015 : 0.015), -0.08, 0);
+          hpGroup.add(cupTrim);
+
+          // Memory Foam Cushion
+          const cushion = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.052, 0.052, 0.02, 10),
+            hpCushionMat
+          );
+          cushion.rotation.z = Math.PI / 2;
+          cushion.position.set(side + (side > 0 ? -0.024 : 0.024), -0.08, 0);
+          hpGroup.add(cushion);
+        });
+
+        // Coiled audio jack cable descending from left cup
+        const cable = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.004, 0.004, 0.22, 4),
+          hpCableMat
+        );
+        cable.position.set(-0.11, -0.20, 0.01);
+        hpGroup.add(cable);
+
+        group.add(hpGroup);
+      });
+    });
+
+    // 6. CLEAR BIG NAME ON ETCHED GLASS HEADER
+    const signW = width - 0.26;
+    const signH = 0.92;
+    const signY = height - 0.72;
+    const signZ = depth / 2 - 0.02;
+
+    const glassTex = createHeadphoneRackGlassTexture(genre);
+    const signMat = new THREE.MeshBasicMaterial({
+      map: glassTex,
+      transparent: true,
+      opacity: 0.96
+    });
+
+    const glassSign = new THREE.Mesh(new THREE.PlaneGeometry(signW, signH), signMat);
+    glassSign.position.set(0, signY, signZ);
+    group.add(glassSign);
+
+    // Warm Brass Overhead Sconce illuminating the rack
+    const sconceCowl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.18, 0.12, 8, 1, true),
+      brassLockMat
+    );
+    sconceCowl.position.set(0, height - 0.22, depth / 2 + 0.12);
+    group.add(sconceCowl);
+
+    const bulb = new THREE.Mesh(
+      new THREE.SphereGeometry(0.05, 8, 8),
+      new THREE.MeshBasicMaterial({ color: '#ffde99' })
+    );
+    bulb.position.set(0, height - 0.25, depth / 2 + 0.12);
+    group.add(bulb);
+
+    // 7. Raycast Hitbox for Interacting with this Headphone Rack
+    const hitBox = new THREE.Mesh(
+      new THREE.BoxGeometry(width + 0.3, height, depth + 0.8),
+      new THREE.MeshBasicMaterial({ visible: false })
+    );
+    hitBox.position.set(0, height / 2, 0.2);
+    hitBox.userData = {
+      isAudiobookRack: true,
+      audioGenreId: genre.id,
+      audioGenre: genre
+    };
+    shelfClickables.push(hitBox);
+    group.add(hitBox);
+
+    scene.add(group);
+    return group;
+  }
+
   // BUILD ALL 22 LOCKED GLASS BOOKCASES:
 
   // 1. Back Wall Bookshelves (6 Shelf Units)
@@ -618,7 +979,16 @@ export function buildBookshelves(scene) {
   createShelfUnit(SHELF_GENRES[20], -8.6, 0, 12.8, 0, 3.2, 2.6, 0.5, 4);
   createShelfUnit(SHELF_GENRES[21], 8.6, 0, 12.8, 0, 3.2, 2.6, 0.5, 4);
 
-  // 5. Populate Thousands of Procedural Books Visible Behind the Glass
+  // 5. BUILD 6 DEDICATED 3D HEADPHONE RACKS FOR AUDIOBOOKS (ONE PER CURATED GENRE)
+  // Symmetrically lining the South Wall flanking the Central Listening Lounge:
+  createHeadphoneRack(AUDIOBOOK_GENRES[0], -14.0, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+  createHeadphoneRack(AUDIOBOOK_GENRES[1], -9.6, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+  createHeadphoneRack(AUDIOBOOK_GENRES[2], -4.8, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+  createHeadphoneRack(AUDIOBOOK_GENRES[3], 4.8, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+  createHeadphoneRack(AUDIOBOOK_GENRES[4], 9.6, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+  createHeadphoneRack(AUDIOBOOK_GENRES[5], 14.0, 0, 14.5, Math.PI, 2.6, 4.6, 0.52);
+
+  // 6. Populate Thousands of Procedural Books Visible Behind the Glass
   const totalEstimatedBooks = 2400;
   const bookGeo = new THREE.BoxGeometry(1, 1, 1);
   const bookMat = new THREE.MeshStandardMaterial({
@@ -683,6 +1053,7 @@ export function buildBookshelves(scene) {
     instancedBooks,
     totalBooks: bookIndex,
     shelfClickables,
-    genresData: SHELF_GENRES
+    genresData: SHELF_GENRES,
+    audioGenresData: AUDIOBOOK_GENRES
   };
 }

@@ -648,7 +648,23 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     if (!controls.isFirstPerson && currentView === '3d') {
       raycaster.setFromCamera(mouse, camera);
       const hits = raycaster.intersectObjects(getAllClickables(), false);
-      domElement.style.cursor = hits.length > 0 ? 'pointer' : 'default';
+      if (hits.length > 0) {
+        domElement.style.cursor = 'pointer';
+        const obj = hits[0].object;
+        if (obj.userData.isAudiobookRack && hintPill) {
+          hintPill.textContent = `🎧 Headphone Rack · ${obj.userData.audioGenre.name} (Click to browse audiobooks & listen on Audible)`;
+        } else if (obj.userData.isAudiobookStation && hintPill) {
+          hintPill.textContent = '🎧 Master Listening Lounge · Browse All Curated Audiobooks';
+        } else if (obj.userData.isShelf && hintPill) {
+          hintPill.textContent = `🔒 ${obj.userData.genreData.title} (Locked Glass Cabinet · Tap to inspect)`;
+        } else if (obj.userData.occupied && hintPill) {
+          hintPill.textContent = `👤 ${obj.userData.studentData?.name || 'Patron'} (${obj.userData.studentData?.topic || 'Focused'})`;
+        } else if (obj.userData.seatId && hintPill) {
+          hintPill.textContent = `🪑 Seat ${obj.userData.seatId} (Vacant · Tap to sit & study)`;
+        }
+      } else {
+        domElement.style.cursor = 'default';
+      }
     }
   });
 
@@ -663,7 +679,12 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
       const hit = hits[0].object;
       const data = hit.userData;
 
-      if (data.isAudiobookStation) {
+      if (data.isAudiobookRack) {
+        showAudiobookModal(data.audioGenreId || 'all');
+        if (hintPill) {
+          hintPill.textContent = `🎧 Browsing Headphone Rack: ${data.audioGenre.name} · Runnable Audible & Amazon links loaded`;
+        }
+      } else if (data.isAudiobookStation) {
         showAudiobookModal('all');
       } else if (data.isShelf) {
         showGenreModal(data.genreData);
