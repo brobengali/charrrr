@@ -355,15 +355,32 @@ export function buildFurniture(scene) {
 function createLaptop(baseMat, screenMat) {
   const group = new THREE.Group();
 
-  // Laptop Base / Keyboard
+  // Laptop Base / Chassis
   const base = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.015, 0.25), baseMat);
   base.castShadow = true;
   group.add(base);
 
-  // Laptop Screen Lid (Angled back at ~110 degrees)
+  // Keyboard Area
+  const keyboard = new THREE.Mesh(
+    new THREE.BoxGeometry(0.32, 0.002, 0.13),
+    new THREE.MeshStandardMaterial({ color: '#272b30', roughness: 0.85, flatShading: true })
+  );
+  keyboard.position.set(0, 0.0085, -0.025);
+  group.add(keyboard);
+
+  // Trackpad
+  const trackpad = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12, 0.002, 0.065),
+    new THREE.MeshStandardMaterial({ color: '#787e85', roughness: 0.4, flatShading: true })
+  );
+  trackpad.position.set(0, 0.0085, 0.08);
+  group.add(trackpad);
+
+  // Laptop Screen Lid (Opened at exactly 88 degree angle relative to the keyboard base)
   const lid = new THREE.Group();
   lid.position.set(0, 0.008, -0.125);
-  lid.rotation.x = -Math.PI / 3;
+  const openAngleDeg = 88;
+  lid.rotation.x = (90 - openAngleDeg) * (Math.PI / 180);
 
   const lidBack = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.24, 0.012), baseMat);
   lidBack.position.set(0, 0.12, 0);
