@@ -132,6 +132,8 @@ export function setupControls(camera, renderer, domElement) {
     }
   });
 
+  let lastWalkPos = null;
+
   // Switch to Walk Around First-Person Mode
   function startWalkMode(startPos = null) {
     if (isFirstPerson) return;
@@ -140,34 +142,46 @@ export function setupControls(camera, renderer, domElement) {
 
     if (startPos) {
       camera.position.set(startPos.x, playerHeight, startPos.z);
+      camera.lookAt(0, playerHeight, 0);
+    } else if (lastWalkPos) {
+      camera.position.copy(lastWalkPos);
     } else {
       camera.position.set(0, playerHeight, 13.0);
+      camera.lookAt(0, playerHeight, 0);
     }
-    camera.lookAt(0, playerHeight, 0);
 
     fpControls.lock();
+    if (controlsAPI.onModeChange) {
+      controlsAPI.onModeChange(true);
+    }
   }
 
-  // Exit First-Person Mode and return to Overview
-  function stopWalkMode() {
+  // Exit First-Person Mode and return to Overview or keep local view
+  function stopWalkMode(resetCamera = true) {
     if (!isFirstPerson) return;
     isFirstPerson = false;
+    lastWalkPos = camera.position.clone();
     fpControls.unlock();
 
     orbit.enabled = true;
-    camera.position.copy(defaultOrbitPos);
-    orbit.target.copy(defaultOrbitTarget);
+    if (resetCamera) {
+      camera.position.copy(defaultOrbitPos);
+      orbit.target.copy(defaultOrbitTarget);
+    } else {
+      const forwardDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+      orbit.target.copy(camera.position).addScaledVector(forwardDir, 2.5);
+    }
     orbit.update();
+
+    if (controlsAPI.onModeChange) {
+      controlsAPI.onModeChange(false, !resetCamera);
+    }
   }
 
-  // PointerLock unlock event listener
+  // PointerLock unlock event listener (e.g. user pressed Escape)
   fpControls.addEventListener('unlock', () => {
     if (isFirstPerson) {
-      stopWalkMode();
-      // Notify UI
-      if (controlsAPI.onModeChange) {
-        controlsAPI.onModeChange(false);
-      }
+      stopWalkMode(true);
     }
   });
 

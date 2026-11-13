@@ -38,7 +38,7 @@ function initApp() {
   const controls = setupControls(camera, renderer, renderer.domElement);
 
   // 8. User Interface & Raycast Interaction (Seats, Bookshelves & Audiobook Lounge)
-  setupUI(camera, scene, renderer.domElement, controls, furnitureAPI, booksAPI, libraryAPI);
+  const uiAPI = setupUI(camera, scene, renderer.domElement, controls, furnitureAPI, booksAPI, libraryAPI);
 
   // 9. Main Animation Loop
   const clock = new THREE.Clock();
@@ -50,6 +50,9 @@ function initApp() {
 
     // Update controls (Orbit damping or first-person WASD physics)
     controls.update(delta);
+
+    // Update first-person aiming & hover feedback
+    uiAPI?.update?.(delta);
 
     // Update animated window rain streaks
     updateRain(delta);

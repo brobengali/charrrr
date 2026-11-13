@@ -309,26 +309,35 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   if (btnWalk) {
     btnWalk.addEventListener('click', () => {
       if (controls.isFirstPerson) {
-        controls.stopWalkMode();
+        controls.stopWalkMode(true);
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
+        hintPill.textContent = "Tap any chair to sit, a locked bookcase for Kindle books, or 🎧 Headphone Racks for Audiobooks.";
       } else {
         controls.startWalkMode();
         btnWalk.textContent = 'Exit walk';
         btnWalk.classList.add('active');
         crosshair.style.display = 'block';
-        hintPill.textContent = 'WASD / Arrows to stroll cafe aisles · Shift to sprint · Esc to exit';
+        hintPill.textContent = 'WASD / Arrows to stroll · Aim & Click to open any shelf · Esc to exit';
       }
     });
 
-    controls.onModeChange = isFP => {
+    controls.onModeChange = (isFP, keptInspectionSpot = false) => {
       if (!isFP) {
         btnWalk.textContent = 'Walk around';
         btnWalk.classList.remove('active');
         crosshair.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
+        if (keptInspectionSpot) {
+          hintPill.textContent = 'Inspecting item · Tap "Walk around" to resume your stroll from here.';
+        } else {
+          hintPill.textContent = "Tap any chair to sit, a locked bookcase for Kindle books, or 🎧 Headphone Racks for Audiobooks.";
+        }
+      } else {
+        btnWalk.textContent = 'Exit walk';
+        btnWalk.classList.add('active');
+        crosshair.style.display = 'block';
+        hintPill.textContent = 'WASD / Arrows to stroll · Aim & Click to open any shelf · Esc to exit';
       }
     };
   }
@@ -668,38 +677,104 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     }
   });
 
-  domElement.addEventListener('click', e => {
-    if (controls.isFirstPerson || currentView !== '3d') return;
-    if (e.target.closest('.pill-btn, .zoom-btn, .modal-backdrop, .app-header, .focusbar')) return;
+  // Handle interaction for both Overview Mode (mouse coordinates) and Walkaround Mode (screen center crosshair)
+  function handleInteract(coords = null) {
+    if (currentView !== '3d') return;
 
-    raycaster.setFromCamera(mouse, camera);
+    // In first-person walkaround mode, crosshair is at the exact center (0, 0)
+    // In overview mode, coords is mouse
+    const targetCoords = coords || (controls.isFirstPerson ? new THREE.Vector2(0, 0) : mouse);
+    raycaster.setFromCamera(targetCoords, camera);
+
+    const maxDist = controls.isFirstPerson ? 26.0 : Infinity;
     const hits = raycaster.intersectObjects(getAllClickables(), false);
 
-    if (hits.length > 0) {
+    if (hits.length > 0 && hits[0].distance <= maxDist) {
       const hit = hits[0].object;
       const data = hit.userData;
+
+      const wasFirstPerson = controls.isFirstPerson;
+      if (wasFirstPerson) {
+        // Unlock pointer lock smoothly without jumping camera back to overview
+        controls.stopWalkMode(false);
+      }
 
       if (data.isAudiobookRack) {
         showAudiobookModal(data.audioGenreId || 'all');
         if (hintPill) {
-          hintPill.textContent = `🎧 Browsing Headphone Rack: ${data.audioGenre.name} · Runnable Audible & Amazon links loaded`;
+          hintPill.textContent = `🎧 Opened Headphone Rack: ${data.audioGenre.name} · Runnable Audible & Amazon archive`;
         }
       } else if (data.isAudiobookStation) {
         showAudiobookModal('all');
+        if (hintPill) {
+          hintPill.textContent = '🎧 Opened Master Listening Lounge · Browse All Curated Audiobooks';
+        }
       } else if (data.isShelf) {
         showGenreModal(data.genreData);
+        if (hintPill) {
+          hintPill.textContent = `🔒 Opened ${data.genreData.title} · Kindle edition available on Amazon`;
+        }
       } else if (data.occupied) {
         showTopicModal(data.studentData, data.seatId, data.tableId, data.side);
-      } else {
+      } else if (data.seatId) {
         openSitModal(data.seatId, data.tableId, data.side);
       }
     }
+  }
+
+  // Click listener for Canvas / Viewport
+  domElement.addEventListener('click', e => {
+    if (e.target.closest('.pill-btn, .zoom-btn, .modal-backdrop, .app-header, .focusbar, .modal-card')) return;
+    handleInteract(controls.isFirstPerson ? new THREE.Vector2(0, 0) : mouse);
   });
+
+  // Keyboard shortcut while walking around: press E, F, or Enter to interact with aimed object
+  window.addEventListener('keydown', e => {
+    if (controls.isFirstPerson && (e.code === 'KeyE' || e.code === 'KeyF' || e.code === 'Enter')) {
+      handleInteract(new THREE.Vector2(0, 0));
+    }
+  });
+
+  // Real-time hover detection for First-Person Walk Mode
+  function updateFirstPersonHover() {
+    if (!controls.isFirstPerson || currentView !== '3d') {
+      if (crosshair && crosshair.classList.contains('interactive')) {
+        crosshair.classList.remove('interactive');
+      }
+      return;
+    }
+
+    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const hits = raycaster.intersectObjects(getAllClickables(), false);
+
+    if (hits.length > 0 && hits[0].distance < 26.0) {
+      const data = hits[0].object.userData;
+      crosshair.classList.add('interactive');
+
+      if (data.isShelf && hintPill) {
+        hintPill.innerHTML = `🔒 <b>[Click / E]</b> Open ${data.genreData.title} (Locked Glass Cabinet)`;
+      } else if (data.isAudiobookRack && hintPill) {
+        hintPill.innerHTML = `🎧 <b>[Click / E]</b> Open Headphone Rack: ${data.audioGenre.name}`;
+      } else if (data.isAudiobookStation && hintPill) {
+        hintPill.innerHTML = `🎧 <b>[Click / E]</b> Open Master Audiobook Lounge`;
+      } else if (data.occupied && hintPill) {
+        hintPill.innerHTML = `👤 <b>[Click / E]</b> View ${data.studentData?.name || 'Patron'}'s Project`;
+      } else if (data.seatId && hintPill) {
+        hintPill.innerHTML = `🪑 <b>[Click / E]</b> Sit at Seat ${data.seatId}`;
+      }
+    } else {
+      crosshair.classList.remove('interactive');
+      if (hintPill && controls.isFirstPerson) {
+        hintPill.textContent = 'WASD / Arrows to stroll · Aim & Click to open any shelf · Esc to exit';
+      }
+    }
+  }
 
   return {
     session,
     showTopicModal,
     showGenreModal,
-    showAudiobookModal
+    showAudiobookModal,
+    update: updateFirstPersonHover
   };
 }
