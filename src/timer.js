@@ -34,7 +34,8 @@ export class StudySession {
       suitColor: '#1e2838',
       tieColor: '#8a2420',
       shirtColor: '#ffffff',
-      hairColor: '#1c1510'
+      hairColor: '#1c1510',
+      linkedin: ''
     };
     this.saveProfile(defaultProfile);
     return defaultProfile;

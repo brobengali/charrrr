@@ -764,6 +764,166 @@ html, body {
   color: #2e1c10;
 }
 
+/* LinkedIn Profile & Networking in Name Cards */
+.connect-tag {
+  background: #e6f0fa;
+  color: #0a66c2;
+  border: 1px solid #b8d4f0;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.linkedin-card-box {
+  background: #f6faff;
+  border: 1.5px solid #cbe0f5;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linkedin-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.linkedin-logo-badge {
+  width: 28px;
+  height: 28px;
+  background: #0a66c2;
+  color: #ffffff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+
+.linkedin-user-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.linkedin-handle-text {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #0a66c2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linkedin-status-sub {
+  font-size: 11px;
+  color: #5a738e;
+}
+
+.linkedin-actions-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.linkedin-connect-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #0a66c2;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(10, 102, 194, 0.28);
+  transition: all 0.15s ease;
+}
+
+.linkedin-connect-btn:hover {
+  background: #004182;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(10, 102, 194, 0.4);
+}
+
+.linkedin-copy-btn {
+  background: #ffffff;
+  border: 1px solid #c2d8f0;
+  color: #335577;
+  padding: 7px 11px;
+  border-radius: 18px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.linkedin-copy-btn:hover {
+  background: #f0f6fc;
+  border-color: #0a66c2;
+  color: #0a66c2;
+}
+
+.linkedin-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #fffdf8;
+  border: 1px solid var(--wood-border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.linkedin-input-wrap:focus-within {
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+}
+
+.linkedin-input-prefix {
+  padding: 10px 10px 10px 12px;
+  background: #f3ecdf;
+  color: #7b6247;
+  font-size: 13px;
+  font-weight: 600;
+  border-right: 1px solid var(--wood-border);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.linkedin-input-wrap .text-input {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 10px 12px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-light);
+  margin-top: 5px;
+  line-height: 1.35;
+}
+
 /* Bookshelf Genre List & Cards */
 .genre-book-list {
   list-style: none;

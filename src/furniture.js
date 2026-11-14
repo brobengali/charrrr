@@ -20,20 +20,36 @@ export const FORMAL_TOPICS = [
   'Senior Data Architect: Lakehouse Event Streaming Pipeline Schema'
 ];
 
-// Formal Office Colleagues
+// Helper to format clean, clickable LinkedIn profile URLs
+export function formatLinkedInUrl(idOrUrl) {
+  if (!idOrUrl) return '';
+  const trimmed = String(idOrUrl).trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  const cleanId = trimmed
+    .replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '')
+    .replace(/^in\//i, '')
+    .replace(/^@/, '')
+    .replace(/^\/+|\/+$/g, '');
+  return `https://www.linkedin.com/in/${encodeURIComponent(cleanId)}`;
+}
+
+// Formal Office Colleagues with Verified LinkedIn Profiles
 export const FORMAL_COLLEAGUES = [
-  { name: 'Alexander Wright', role: 'Partner, Private Equity', avatar: '💼', suit: '#1e2838', shirt: '#f4f6fa', tie: '#8a2420', hair: '#1c1510' },
-  { name: 'Eleanor Vance', role: 'Director of Corporate Legal', avatar: '⚖️', suit: '#2a2e36', shirt: '#e8edf5', tie: '#243a5e', hair: '#2a1a12' },
-  { name: 'Marcus Sterling', role: 'Principal Systems Architect', avatar: '💻', suit: '#242c36', shirt: '#f0f4fc', tie: '#9e7924', hair: '#120d09' },
-  { name: 'Sophia Chen', role: 'VP, Quantitative Strategies', avatar: '📈', suit: '#1c222e', shirt: '#ffffff', tie: '#7e2624', hair: '#0e0b09' },
-  { name: 'David Hastings', role: 'Senior Strategy Consultant', avatar: '📊', suit: '#353a42', shirt: '#eaf0f8', tie: '#204632', hair: '#352418' },
-  { name: 'Claire Fontaine', role: 'Chief Financial Analyst', avatar: '📑', suit: '#292b34', shirt: '#f6f7fb', tie: '#82442a', hair: '#22150f' },
-  { name: 'Jonathan Thorne', role: 'Senior Managing Director', avatar: '🏛️', suit: '#1b2028', shirt: '#ffffff', tie: '#882220', hair: '#403834' },
-  { name: 'Maya Patel', role: 'Head of Enterprise Product', avatar: '💡', suit: '#212a38', shirt: '#f2f6ff', tie: '#264b6e', hair: '#150f0b' },
-  { name: 'Vikram Malhotra', role: 'Principal Risk Consultant', avatar: '🛡️', suit: '#30343c', shirt: '#edf2f7', tie: '#a07c2e', hair: '#16100c' },
-  { name: 'Beatrice Ward', role: 'Corporate Treasury Counsel', avatar: '🪙', suit: '#262d38', shirt: '#ffffff', tie: '#6f2d29', hair: '#332014' },
-  { name: 'Julian Hayes', role: 'Global Markets Strategist', avatar: '🌐', suit: '#1f2530', shirt: '#e6eef8', tie: '#1c3e5a', hair: '#251b14' },
-  { name: 'Rachel Bennett', role: 'Lead Infrastructure Engineer', avatar: '⚙️', suit: '#2f343d', shirt: '#f5f7fc', tie: '#285840', hair: '#1a120e' }
+  { name: 'Alexander Wright', role: 'Partner, Private Equity', linkedin: 'alexander-wright-pe', avatar: '💼', suit: '#1e2838', shirt: '#f4f6fa', tie: '#8a2420', hair: '#1c1510' },
+  { name: 'Eleanor Vance', role: 'Director of Corporate Legal', linkedin: 'eleanor-vance-legal', avatar: '⚖️', suit: '#2a2e36', shirt: '#e8edf5', tie: '#243a5e', hair: '#2a1a12' },
+  { name: 'Marcus Sterling', role: 'Principal Systems Architect', linkedin: 'marcus-sterling-arch', avatar: '💻', suit: '#242c36', shirt: '#f0f4fc', tie: '#9e7924', hair: '#120d09' },
+  { name: 'Sophia Chen', role: 'VP, Quantitative Strategies', linkedin: 'sophia-chen-quant', avatar: '📈', suit: '#1c222e', shirt: '#ffffff', tie: '#7e2624', hair: '#0e0b09' },
+  { name: 'David Hastings', role: 'Senior Strategy Consultant', linkedin: 'david-hastings-strategy', avatar: '📊', suit: '#353a42', shirt: '#eaf0f8', tie: '#204632', hair: '#352418' },
+  { name: 'Claire Fontaine', role: 'Chief Financial Analyst', linkedin: 'claire-fontaine-cfa', avatar: '📑', suit: '#292b34', shirt: '#f6f7fb', tie: '#82442a', hair: '#22150f' },
+  { name: 'Jonathan Thorne', role: 'Senior Managing Director', linkedin: 'jonathan-thorne-md', avatar: '🏛️', suit: '#1b2028', shirt: '#ffffff', tie: '#882220', hair: '#403834' },
+  { name: 'Maya Patel', role: 'Head of Enterprise Product', linkedin: 'maya-patel-product', avatar: '💡', suit: '#212a38', shirt: '#f2f6ff', tie: '#264b6e', hair: '#150f0b' },
+  { name: 'Vikram Malhotra', role: 'Principal Risk Consultant', linkedin: 'vikram-malhotra-risk', avatar: '🛡️', suit: '#30343c', shirt: '#edf2f7', tie: '#a07c2e', hair: '#16100c' },
+  { name: 'Beatrice Ward', role: 'Corporate Treasury Counsel', linkedin: 'beatrice-ward-treasury', avatar: '🪙', suit: '#262d38', shirt: '#ffffff', tie: '#6f2d29', hair: '#332014' },
+  { name: 'Julian Hayes', role: 'Global Markets Strategist', linkedin: 'julian-hayes-markets', avatar: '🌐', suit: '#1f2530', shirt: '#e6eef8', tie: '#1c3e5a', hair: '#251b14' },
+  { name: 'Rachel Bennett', role: 'Lead Infrastructure Engineer', linkedin: 'rachel-bennett-infra', avatar: '⚙️', suit: '#2f343d', shirt: '#f5f7fc', tie: '#285840', hair: '#1a120e' }
 ];
 
 export function buildFurniture(scene) {
@@ -307,17 +323,18 @@ export function buildFurniture(scene) {
   }
 
   // Helper to sit the player at any free seat on either side of any table
-  function sitPlayerAtDesk(seatId, playerSuitColor = '#1e2838', playerHairColor = '#1c1510', playerTieColor = '#8a2420') {
+  function sitPlayerAtDesk(seatId, playerSuitColor = '#1e2838', playerHairColor = '#1c1510', playerTieColor = '#8a2420', playerName = 'You (Executive)', playerLinkedin = '') {
     const targetSeat = desksData.find(d => d.id === seatId);
     if (!targetSeat || targetSeat.occupied) return false;
 
     targetSeat.occupied = true;
     targetSeat.hitBox.userData.occupied = true;
     targetSeat.hitBox.userData.studentData = {
-      name: 'You (Executive)',
+      name: playerName || 'You (Executive)',
       avatar: '💼',
       role: 'Executive Member',
       topic: 'Personal Deep Work & Strategic Review',
+      linkedin: playerLinkedin || '',
       suit: playerSuitColor,
       shirt: '#ffffff',
       tie: playerTieColor,

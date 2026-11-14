@@ -9,8 +9,8 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon-_ZmbRfoM.ico" />
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon-DPZwm-Rt.png" />
   <link rel="manifest" href="/assets/manifest-LCHHdcVV.webmanifest" />
-  <script type="module" crossorigin src="/assets/index-CffGHP45.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-DhLYa2SB.css">
+  <script type="module" crossorigin src="/assets/index-sGXKpsDB.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C77FsrMQ.css">
 </head>
 
 <body>
@@ -125,6 +125,16 @@
           placeholder="e.g. Q4 Strategy Review, Financial Modeling, System Architecture..." maxlength="90" autofocus />
       </div>
 
+      <div class="form-group" style="margin-top: 14px;">
+        <label for="input-linkedin-id">Connect your LinkedIn Profile (optional):</label>
+        <div class="linkedin-input-wrap">
+          <span class="linkedin-input-prefix">in/</span>
+          <input type="text" id="input-linkedin-id" class="text-input"
+            placeholder="your-name or custom-id (e.g. rahul-sharma)" maxlength="100" />
+        </div>
+        <span class="field-hint">Colleagues who tap your chair in the cafe can connect with you directly on LinkedIn.</span>
+      </div>
+
       <div class="modal-btn-row">
         <button id="btn-confirm-sit" class="primary-btn">Take seat & start working</button>
       </div>
@@ -137,7 +147,7 @@
       <button class="close-btn" data-close="topic-modal" aria-label="Close">&times;</button>
       <div class="topic-header">
         <div id="topic-avatar" class="topic-avatar">💼</div>
-        <div>
+        <div style="flex: 1;">
           <h3 id="topic-name">Colleague</h3>
           <div id="topic-role" style="font-size: 0.85rem; color: #8c7355; font-weight: 500;">Executive Member</div>
           <span id="topic-seat" class="seat-badge">Table T01 · North Seat</span>
@@ -146,6 +156,34 @@
       <div class="topic-divider"></div>
       <div class="topic-label">Currently Working On</div>
       <div id="topic-text" class="topic-body">Strategic Market Analysis</div>
+
+      <div class="topic-divider"></div>
+      <div class="topic-label" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>Professional Network</span>
+        <span class="connect-tag">Verified Peer</span>
+      </div>
+
+      <div class="linkedin-card-box">
+        <div class="linkedin-info-row">
+          <div class="linkedin-logo-badge">in</div>
+          <div class="linkedin-user-details">
+            <span id="topic-linkedin-handle" class="linkedin-handle-text">linkedin.com/in/...</span>
+            <span class="linkedin-status-sub">Connect &amp; network in Connect Cafe</span>
+          </div>
+        </div>
+        <div class="linkedin-actions-row">
+          <a id="topic-linkedin-btn" href="#" target="_blank" rel="noopener noreferrer" class="linkedin-connect-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.62 1.62 0 1 0 0-3.24 1.62 1.62 0 0 0 0 3.24m1.4 9.74v-8.37H5.06v8.37h2.8z"/>
+            </svg>
+            <span id="topic-linkedin-btn-text">Connect on LinkedIn</span>
+            <span style="font-size: 13px;">↗</span>
+          </a>
+          <button id="btn-copy-linkedin" class="linkedin-copy-btn" title="Copy profile URL">
+            <span id="copy-icon">📋</span> <span id="copy-text">Copy</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -208,12 +246,25 @@
     </div>
   </div>
 
-  <!-- Modal: Wardrobe Customizer (Formal Office Attire) -->
+  <!-- Modal: Wardrobe Customizer (Formal Office Attire & Profile) -->
   <div id="wardrobe-modal" class="modal-backdrop" style="display: none;">
     <div class="wardrobe-panel">
       <button class="close-btn" data-close="wardrobe-modal" aria-label="Close">&times;</button>
-      <h2>Executive Wardrobe</h2>
-      <p class="wardrobe-subtitle">Customize your formal office attire and hair in the cafe hall.</p>
+      <h2>Executive Profile & Wardrobe</h2>
+      <p class="wardrobe-subtitle">Customize your formal office attire and professional networking card.</p>
+
+      <div class="wardrobe-section">
+        <label for="input-wardrobe-name">Display Name</label>
+        <input type="text" id="input-wardrobe-name" class="text-input" placeholder="e.g. Rahul Sharma" maxlength="40" style="margin-top: 6px;" />
+      </div>
+
+      <div class="wardrobe-section">
+        <label for="input-wardrobe-linkedin">Your LinkedIn ID (so colleagues can connect)</label>
+        <div class="linkedin-input-wrap" style="margin-top: 6px;">
+          <span class="linkedin-input-prefix">linkedin.com/in/</span>
+          <input type="text" id="input-wardrobe-linkedin" class="text-input" placeholder="your-username" maxlength="100" />
+        </div>
+      </div>
 
       <div class="wardrobe-section">
         <label>Suit & Blazer Color</label>

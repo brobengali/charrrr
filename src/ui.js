@@ -3,6 +3,7 @@ import { playFocusChime, toggleRainSound } from './audio.js';
 import { StudySession } from './timer.js';
 import { getBookAffiliateLink } from './books.js';
 import { AUDIOBOOK_GENRES, getAudiobookAffiliateLink, getAudibleDirectLink } from './audiobooks.js';
+import { formatLinkedInUrl } from './furniture.js';
 
 // Room Moods & Descriptions
 const ROOM_INFO = {
@@ -81,6 +82,7 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   const sitModal = document.getElementById('sit-modal');
   const sitModalTitle = document.getElementById('sit-modal-title');
   const inputStudyTopic = document.getElementById('input-study-topic');
+  const inputLinkedinId = document.getElementById('input-linkedin-id');
   const btnConfirmSit = document.getElementById('btn-confirm-sit');
 
   const topicModal = document.getElementById('topic-modal');
@@ -89,6 +91,11 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   const topicAvatar = document.getElementById('topic-avatar');
   const topicSeat = document.getElementById('topic-seat');
   const topicText = document.getElementById('topic-text');
+  const topicLinkedinHandle = document.getElementById('topic-linkedin-handle');
+  const topicLinkedinBtn = document.getElementById('topic-linkedin-btn');
+  const topicLinkedinBtnText = document.getElementById('topic-linkedin-btn-text');
+  const btnCopyLinkedin = document.getElementById('btn-copy-linkedin');
+  const copyText = document.getElementById('copy-text');
 
   // Bookshelf Genre Modal
   const genreModal = document.getElementById('genre-modal');
@@ -105,6 +112,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   const audiobookList = document.getElementById('audiobook-list');
 
   const wardrobeModal = document.getElementById('wardrobe-modal');
+  const inputWardrobeName = document.getElementById('input-wardrobe-name');
+  const inputWardrobeLinkedin = document.getElementById('input-wardrobe-linkedin');
+  const wardrobeDone = document.getElementById('wardrobe-done');
   const suitSwatches = document.getElementById('suit-swatches');
   const tieSwatches = document.getElementById('tie-swatches');
   const hairSwatches = document.getElementById('hair-swatches');
@@ -214,6 +224,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     const sideName = side === 'N' ? 'North Chair (Facing South)' : 'South Chair (Facing North)';
     sitModalTitle.textContent = `Take Seat ${seatId} (${sideName})`;
     inputStudyTopic.value = session.myTopic || '';
+    if (inputLinkedinId) {
+      inputLinkedinId.value = session.profile.linkedin || '';
+    }
     sitModal.style.display = 'flex';
     inputStudyTopic.focus();
   }
@@ -221,6 +234,8 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   if (btnConfirmSit) {
     btnConfirmSit.addEventListener('click', () => {
       const topic = inputStudyTopic.value.trim() || 'Personal Deep Focus & Strategy Review';
+      const linkedin = inputLinkedinId ? inputLinkedinId.value.trim() : (session.profile.linkedin || '');
+      session.saveProfile({ linkedin });
       sitModal.style.display = 'none';
 
       if (selectedSeatForSit) {
@@ -228,7 +243,9 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
           selectedSeatForSit,
           session.profile.suitColor || '#1e2838',
           session.profile.hairColor || '#1c1510',
-          session.profile.tieColor || '#8a2420'
+          session.profile.tieColor || '#8a2420',
+          session.profile.name || 'You (Executive)',
+          linkedin
         );
 
         if (success) {
@@ -366,6 +383,34 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     const sideDesc = side === 'N' ? 'North Chair' : (side === 'S' ? 'South Chair' : '');
     topicSeat.textContent = `${seatId} ${sideDesc ? '· ' + sideDesc : ''}`;
     topicText.textContent = colleagueData.topic || 'Reviewing strategic company initiatives';
+
+    // LinkedIn Profile Connection
+    const rawLinkedin = colleagueData.linkedin || colleagueData.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const linkedInUrl = formatLinkedInUrl(rawLinkedin);
+    const displayHandle = linkedInUrl.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//i, 'in/').replace(/\/$/, '');
+
+    if (topicLinkedinHandle) {
+      topicLinkedinHandle.textContent = displayHandle;
+    }
+    if (topicLinkedinBtn) {
+      topicLinkedinBtn.href = linkedInUrl;
+    }
+    if (topicLinkedinBtnText) {
+      const firstName = (colleagueData.name || 'Peer').split(' ')[0];
+      topicLinkedinBtnText.textContent = `Connect with ${firstName}`;
+    }
+    if (btnCopyLinkedin) {
+      btnCopyLinkedin.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(linkedInUrl);
+          if (copyText) copyText.textContent = 'Copied!';
+          setTimeout(() => { if (copyText) copyText.textContent = 'Copy'; }, 2000);
+        } catch (e) {
+          prompt('Copy LinkedIn Profile URL:', linkedInUrl);
+        }
+      };
+    }
+
     topicModal.style.display = 'flex';
   }
 
@@ -573,6 +618,13 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
 
   if (btnWardrobe) {
     btnWardrobe.addEventListener('click', () => {
+      if (inputWardrobeName) {
+        inputWardrobeName.value = session.profile.name || '';
+      }
+      if (inputWardrobeLinkedin) {
+        inputWardrobeLinkedin.value = session.profile.linkedin || '';
+      }
+
       buildSwatches(suitSwatches, SUIT_COLORS, session.profile.suitColor || '#1e2838', color => {
         session.saveProfile({ suitColor: color });
       });
@@ -586,6 +638,21 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
       });
 
       wardrobeModal.style.display = 'flex';
+    });
+  }
+
+  if (wardrobeDone) {
+    wardrobeDone.addEventListener('click', () => {
+      const newName = inputWardrobeName ? inputWardrobeName.value.trim() : '';
+      const newLinkedin = inputWardrobeLinkedin ? inputWardrobeLinkedin.value.trim() : '';
+      session.saveProfile({
+        name: newName || 'Executive Member',
+        linkedin: newLinkedin
+      });
+      if (inputLinkedinId) {
+        inputLinkedinId.value = newLinkedin;
+      }
+      hintPill.textContent = 'Executive profile & LinkedIn card updated.';
     });
   }
 
