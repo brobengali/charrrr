@@ -46,6 +46,19 @@ const distDir = path.join(__dirname, 'dist');
 const useDist = fs.existsSync(distDir) && fs.existsSync(path.join(distDir, 'index.html'));
 const baseDir = useDist ? distDir : __dirname;
 
+// In-memory live seat registry: { [seatId]: { name, topic, linkedin, suit, hair, tie, role, updatedAt } }
+const liveSeats = new Map();
+
+// Periodic cleanup of abandoned seats older than 8 hours
+setInterval(() => {
+  const now = Date.now();
+  for (const [seatId, data] of liveSeats.entries()) {
+    if (now - (data.updatedAt || 0) > 8 * 60 * 60 * 1000) {
+      liveSeats.delete(seatId);
+    }
+  }
+}, 10 * 60 * 1000);
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   let pathname = decodeURIComponent(parsedUrl.pathname);
@@ -55,6 +68,57 @@ const server = http.createServer((req, res) => {
     res.writeHead(302, { 'Location': '/' });
     res.end();
     return;
+  }
+
+  // Handle API: Live Seats Synchronization for Internet Visitors
+  if (pathname === '/api/seats') {
+    if (req.method === 'GET') {
+      const seatsObj = {};
+      for (const [sId, sData] of liveSeats.entries()) {
+        seatsObj[sId] = sData;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' });
+      res.end(JSON.stringify({ ok: true, seats: seatsObj }));
+      return;
+    }
+
+    if (req.method === 'POST') {
+      let body = '';
+      req.on('data', chunk => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const payload = JSON.parse(body || '{}');
+          if (payload.seatId) {
+            liveSeats.set(payload.seatId, {
+              name: String(payload.name || 'Cafe Patron').slice(0, 40),
+              topic: String(payload.topic || 'Deep Focus').slice(0, 100),
+              linkedin: String(payload.linkedin || '').slice(0, 120),
+              suit: payload.suit || '#1e2838',
+              hair: payload.hair || '#1c1510',
+              tie: payload.tie || '#8a2420',
+              role: 'Cafe Member',
+              updatedAt: Date.now()
+            });
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: true }));
+        } catch (err) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'invalid_json' }));
+        }
+      });
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      const sId = parsedUrl.query?.seatId;
+      if (sId) {
+        liveSeats.delete(sId);
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true }));
+      return;
+    }
   }
 
   // Handle API mock endpoints for local/offline resilience

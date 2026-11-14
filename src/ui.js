@@ -231,6 +231,46 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
     inputStudyTopic.focus();
   }
 
+  // Network Seating Sync
+  async function broadcastSeatClaim(seatId, topic, linkedin) {
+    try {
+      await fetch('/api/seats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          seatId,
+          name: session.profile.name || 'Executive Member',
+          topic,
+          linkedin,
+          suit: session.profile.suitColor || '#1e2838',
+          hair: session.profile.hairColor || '#1c1510',
+          tie: session.profile.tieColor || '#8a2420'
+        })
+      });
+    } catch (e) {}
+  }
+
+  async function broadcastSeatVacate(seatId) {
+    try {
+      await fetch(`/api/seats?seatId=${encodeURIComponent(seatId)}`, {
+        method: 'DELETE'
+      });
+    } catch (e) {}
+  }
+
+  async function syncLiveSeats() {
+    try {
+      const res = await fetch('/api/seats');
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.seats && furnitureAPI.syncRemoteSeats) {
+          furnitureAPI.syncRemoteSeats(data.seats, session.mySeat);
+          if (currentView === '2d') render2DFloorGrid();
+        }
+      }
+    } catch (e) {}
+  }
+
   if (btnConfirmSit) {
     btnConfirmSit.addEventListener('click', () => {
       const topic = inputStudyTopic.value.trim() || 'Personal Deep Focus & Strategy Review';
@@ -239,21 +279,30 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
       sitModal.style.display = 'none';
 
       if (selectedSeatForSit) {
+        // If moving from a previous seat, vacate previous seat first
+        if (session.mySeat && session.mySeat !== selectedSeatForSit) {
+          broadcastSeatVacate(session.mySeat);
+          furnitureAPI.vacateSeat(session.mySeat);
+        }
+
         const success = furnitureAPI.sitPlayerAtDesk(
           selectedSeatForSit,
           session.profile.suitColor || '#1e2838',
           session.profile.hairColor || '#1c1510',
           session.profile.tieColor || '#8a2420',
           session.profile.name || 'You (Executive)',
-          linkedin
+          linkedin,
+          topic
         );
 
         if (success) {
           session.mySeat = selectedSeatForSit;
           session.startFocus(topic);
+          broadcastSeatClaim(selectedSeatForSit, topic, linkedin);
           currentTopicLabel.textContent = `${topic} (${selectedSeatForSit})`;
           hintPill.textContent = `Sitting at ${selectedSeatForSit} · Project: ${topic}`;
           btnStandUp.style.display = 'inline-block';
+          render2DFloorGrid();
 
           const seatObj = furnitureAPI.desksData.find(d => d.id === selectedSeatForSit);
           if (seatObj) {
@@ -280,14 +329,21 @@ export function setupUI(camera, scene, domElement, controls, furnitureAPI, books
   if (btnStandUp) {
     btnStandUp.addEventListener('click', () => {
       if (session.mySeat) {
+        broadcastSeatVacate(session.mySeat);
+        furnitureAPI.vacateSeat(session.mySeat);
         session.reset();
         session.mySeat = null;
         currentTopicLabel.textContent = 'None (Pick a chair to sit)';
         btnStandUp.style.display = 'none';
-        hintPill.textContent = "Tap any chair to sit, someone's desk to view their topic, or a locked glass bookcase to browse its genre.";
+        hintPill.textContent = "Tap any chair to sit, a locked glass bookcase for Kindle books, or 🎧 Headphone Racks for Audiobooks.";
+        render2DFloorGrid();
       }
     });
   }
+
+  // Poll live seats every 6 seconds so online visitors see each other in real-time
+  setInterval(syncLiveSeats, 6000);
+  syncLiveSeats();
 
   // 7. Focus Timer Action
   if (btnTimerAction) {

@@ -239,7 +239,7 @@ export function buildFurniture(scene) {
       scene.add(tableGroup);
 
       // 6. BOTH-SIDE SEATING (North Seat facing South, South Seat facing North)
-      // Decide occupancy: populate about 35% of seats with formal office goers
+      // All seats start completely vacant and ready for real users and internet visitors
       const seatSides = [
         { side: 'N', name: 'North', facing: 1, zOffset: -0.76 },
         { side: 'S', name: 'South', facing: -1, zOffset: 0.76 }
@@ -247,39 +247,13 @@ export function buildFurniture(scene) {
 
       seatSides.forEach(s => {
         const seatId = `${tableId}-${s.side}`;
-        // Deterministic pseudo-random occupancy based on table and side
-        const hash = Math.abs(Math.sin(c * 17.3 + r * 31.7 + (s.side === 'N' ? 5.1 : 9.9)));
-        const occupied = hash > 0.62; // roughly ~38% occupied, remaining are open for the player
-
+        const occupied = false;
         let colleagueData = null;
         let avatarGroup = null;
 
-        if (occupied) {
-          const colleagueIdx = Math.floor(hash * 100) % FORMAL_COLLEAGUES.length;
-          const colleague = FORMAL_COLLEAGUES[colleagueIdx];
-          const topic = FORMAL_TOPICS[(colleagueIdx + r) % FORMAL_TOPICS.length];
-
-          colleagueData = {
-            ...colleague,
-            topic
-          };
-
-          // Create Formal Office Character
-          avatarGroup = createFormalOfficeAvatar(
-            colleague.suit,
-            colleague.shirt,
-            colleague.tie,
-            colleague.hair,
-            hash > 0.78
-          );
-          avatarGroup.position.set(tx, 0, tz + s.zOffset);
-          avatarGroup.rotation.y = s.facing > 0 ? 0 : Math.PI;
-          tableGroup.add(avatarGroup);
-        }
-
-        // Chair on this side
+        // Chair on this side - pulled out slightly in vacant ready-to-sit position
         const chairGroup = createExecutiveChair(chairWoodMat, chairLeatherMat);
-        const chairZ = tz + (occupied ? s.zOffset : s.zOffset * 1.15);
+        const chairZ = tz + s.zOffset * 1.15;
         chairGroup.position.set(tx, 0, chairZ);
         chairGroup.rotation.y = s.facing > 0 ? 0 : Math.PI;
         tableGroup.add(chairGroup);
@@ -322,30 +296,37 @@ export function buildFurniture(scene) {
     }
   }
 
-  // Helper to sit the player at any free seat on either side of any table
-  function sitPlayerAtDesk(seatId, playerSuitColor = '#1e2838', playerHairColor = '#1c1510', playerTieColor = '#8a2420', playerName = 'You (Executive)', playerLinkedin = '') {
+  // Helper to sit a user or colleague at any free seat on either side of any table
+  function sitPlayerAtDesk(seatId, playerSuitColor = '#1e2838', playerHairColor = '#1c1510', playerTieColor = '#8a2420', playerName = 'You (Executive)', playerLinkedin = '', playerTopic = 'Personal Deep Work & Strategic Review', role = 'Executive Member') {
     const targetSeat = desksData.find(d => d.id === seatId);
-    if (!targetSeat || targetSeat.occupied) return false;
+    if (!targetSeat) return false;
+
+    // If already occupied by someone else, vacate previous avatar before placing new one
+    if (targetSeat.avatarGroup) {
+      targetSeat.tableGroup.remove(targetSeat.avatarGroup);
+      targetSeat.avatarGroup = null;
+    }
 
     targetSeat.occupied = true;
     targetSeat.hitBox.userData.occupied = true;
-    targetSeat.hitBox.userData.studentData = {
-      name: playerName || 'You (Executive)',
+    targetSeat.studentData = {
+      name: playerName || 'Executive Member',
       avatar: '💼',
-      role: 'Executive Member',
-      topic: 'Personal Deep Work & Strategic Review',
+      role: role || 'Executive Member',
+      topic: playerTopic || 'Personal Deep Work & Strategic Review',
       linkedin: playerLinkedin || '',
       suit: playerSuitColor,
       shirt: '#ffffff',
       tie: playerTieColor,
       hair: playerHairColor
     };
+    targetSeat.hitBox.userData.studentData = targetSeat.studentData;
 
-    // Tuck chair in
+    // Tuck chair into desk
     targetSeat.chairGroup.position.z = targetSeat.tz + targetSeat.zOffset;
     targetSeat.chairGroup.rotation.y = targetSeat.facing > 0 ? 0 : Math.PI;
 
-    // Create player formal avatar
+    // Create formal avatar
     const playerAvatar = createFormalOfficeAvatar(
       playerSuitColor,
       '#ffffff',
@@ -361,10 +342,60 @@ export function buildFurniture(scene) {
     return true;
   }
 
+  // Helper to vacate a seat when someone stands up
+  function vacateSeat(seatId) {
+    const targetSeat = desksData.find(d => d.id === seatId);
+    if (!targetSeat) return false;
+
+    if (targetSeat.avatarGroup) {
+      targetSeat.tableGroup.remove(targetSeat.avatarGroup);
+      targetSeat.avatarGroup = null;
+    }
+
+    targetSeat.occupied = false;
+    targetSeat.studentData = null;
+    targetSeat.hitBox.userData.occupied = false;
+    targetSeat.hitBox.userData.studentData = null;
+
+    // Pull chair out slightly into vacant ready-to-sit position
+    targetSeat.chairGroup.position.z = targetSeat.tz + targetSeat.zOffset * 1.15;
+    targetSeat.chairGroup.rotation.y = targetSeat.facing > 0 ? 0 : Math.PI;
+
+    return true;
+  }
+
+  // Synchronize live seats from server/network
+  function syncRemoteSeats(remoteSeatsMap = {}, mySeatId = null) {
+    desksData.forEach(seat => {
+      // Never overwrite the local user's own seat
+      if (mySeatId && seat.id === mySeatId) return;
+
+      const remote = remoteSeatsMap[seat.id];
+      if (remote) {
+        // Seat is occupied by a live internet patron
+        sitPlayerAtDesk(
+          seat.id,
+          remote.suit || '#1e2838',
+          remote.hair || '#1c1510',
+          remote.tie || '#8a2420',
+          remote.name || 'Cafe Patron',
+          remote.linkedin || '',
+          remote.topic || 'Deep Focus',
+          remote.role || 'Cafe Patron'
+        );
+      } else if (seat.occupied) {
+        // Remote patron stood up or disconnected
+        vacateSeat(seat.id);
+      }
+    });
+  }
+
   return {
     desksData,
     deskClickables,
-    sitPlayerAtDesk
+    sitPlayerAtDesk,
+    vacateSeat,
+    syncRemoteSeats
   };
 }
 
