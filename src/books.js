@@ -15,8 +15,8 @@ const BOOK_PALETTE = [
   '#5c5346'  // Slate olive
 ];
 
-// Amazon Associates Affiliate Tag (Replace with your actual affiliate tag, e.g. 'hushhall-20')
-export const AMAZON_AFFILIATE_TAG = 'hushhall-20';
+// Amazon Associates Affiliate Tag (Replace with your actual affiliate tag, e.g. 'connectcafe-20')
+export const AMAZON_AFFILIATE_TAG = 'connectcafe-20';
 
 // Helper to generate Amazon Kindle book affiliate purchase search link
 export function getBookAffiliateLink(bookString, affiliateTag = AMAZON_AFFILIATE_TAG) {

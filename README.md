@@ -1,89 +1,117 @@
-# Hush Hall · A Quiet Virtual Library
+# Connect Cafe · 3D Virtual Library Cafe & Co-Working Lounge
 
-An exact, authentic copy of **Hush Hall** ([hush-hall.vercel.app](https://hush-hall.vercel.app/)) without any hardcoding or synthetic shortcuts. Built with complete fidelity to the original architecture, styling, and behavior.
+**Connect Cafe** is an interactive, low-poly 3D virtual study cafe and co-working lounge built with **Three.js** and **Vite** (vanilla JavaScript). It blends the ambiance of a quiet, upscale study cafe with a scholarly library to help you focus, read, and listen alongside peers in deep work.
 
 ---
 
-## 🏛️ Overview
+## ☕ Core Highlights
 
-**Hush Hall** is a minimalist, quiet virtual library designed to help adults study and focus alongside others without notifications, gamified streaks, or social distraction:
-- **No Friction**: No forced accounts, streaks, or noisy feeds. Sign-in has been completely removed so anyone can enter and study immediately.
-- **Silent Presence**: Replicates the calm psychological accountability of sitting in a physical reading room where others are quietly working.
-- **Dual Perspectives**:
-  - **2D Floor View**: Numbered rows (`A1`–`D6`), center aisle, warm wooden desk cards, focus/break/idle glowing status lamps, weekly hour meters, and bottom focus bar.
-  - **3D Interactive Hall (Three.js WebGL)**: Full 3D reading room with desks, chairs, lamps, books, floating tags (`tag3d`), full WASD/arrows movement, mobile touch controls, wardrobe styling, and the option to kneel on a reading cushion on the floor (`G`).
+- **56 Cafe Tables with Both-Side Seating (112 Chairs)**: Face-to-face seating layout across East and West wings, accommodating over 100 patrons.
+- **Formal Office Goer Dress Code**: Seated 3D avatars dressed in tailored executive wool suits, dress shirts, silk neckties, trousers, and glasses across finance, tech, quant, and legal disciplines.
+- **88° Laptop Open Angle**: Detailed laptops with ultra-thin aluminum unibody bases, recessed keyboards, glass trackpads, and screens opened to an exact 88-degree viewing angle.
+- **22 Locked Glass Bookcases with Big Clear Genre Names**:
+  - Cabinets enclosed with translucent glass panes, brass lock escutcheons, and teardrop pulls.
+  - Clear, prominent gold-bordered genre titles emblazoned directly on the glass.
+  - Interactive book list with **Amazon Kindle affiliate links** (`connectcafe-20`) so patrons can purchase and study real-life editions at home.
+- **6 Dedicated 3D Headphone Racks for Audiobooks**:
+  - Full-height multi-tier listening fixtures flanking the South Promenade.
+  - Multi-tier polished brass hanging rods carrying 12 pairs of over-ear studio headphones (padded leather headbands, brass gimbals, ear cushions, and coiled cables).
+  - Lower analog Hi-Fi amplifier console with dual illuminated amber VU meters and rotary dials.
+  - Overhead etched glass signs for all 6 curated genres:
+    1. 💼 *Business & High Performance*
+    2. 🤖 *AI, Tech & The Future*
+    3. 📈 *Economics, Markets & Finance*
+    4. 🏛️ *Philosophy & Mental Models*
+    5. ⚛️ *Science, Cosmos & Biology*
+    6. 🎙️ *Biographies & Masterminds*
+  - Dual **runnable Audible and Amazon audiobook links** with a 30-day Audible free trial partner banner.
+- **First-Person Walkaround Mode with Aim & Click Shelf Inspection**:
+  - Seamless WASD / Arrow movement and sprint (`Shift`).
+  - Dynamic crosshair targeting: looking at any bookcase, headphone rack, or desk transforms the reticle into an illuminated gold ring.
+  - **Click or Press `E` / `F` / `Enter`** to open and inspect any shelf while walking around without losing your walk position!
+- **Grand Espresso Bar**:
+  - Commercial dual-group espresso machine with steam wands, grinder, stacked ceramic cups, pastry case with fresh croissants, and a chalkboard menu.
+  - Illuminated brass 3D plaque emblazoned with **`☕ CONNECT CAFE ☕`**.
+- **Focus Mechanics**:
+  - Pomodoro focus timer with 25/5 intervals and chime notifications.
+  - Procedural rain soundscape synthesized via Web Audio API.
+  - Executive wardrobe customizer (suits, ties, hair colors).
+  - Daily/weekly study hours tracker and executive desk notes with autosave.
+  - 2D Floor Plan view toggle for quick navigation.
 
 ---
 
 ## 🚀 How to Run
 
-You can run the library locally using Node.js:
+### 1. Development Server (Vite HMR)
 
 ```bash
-# Start on default port (8080)
-npm start
-
-# Or specify any port directly
-node server.js 5000
-# or
-node server.js --port 4000
+npm install
+npm run dev
 ```
 
-Then open your browser to:
-👉 **[http://localhost:8080](http://localhost:8080)** (or the chosen port)
+Open your browser to:
+👉 **[http://localhost:5173](http://localhost:5173)**
 
-*(Alternatively, run `npx serve .` or host on Vercel, Netlify, or any static hosting service).*
+### 2. Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+### 3. Standalone Node.js Server
+
+```bash
+node server.js 8080
+```
 
 ---
 
-## 📚 What's Included
+## 🎮 Controls & Shortcuts
 
-### 1. The 4 Public Reading Halls
-- **Main Reading Hall** (`/hall/main-reading`): *"Big, quiet, long tables · Silent. Nods only."*
-- **Science Wing** (`/hall/science-wing`): *"Labs, papers, problem sets · Silent. Diagrams welcome."*
-- **Exam Season Hall** (`/hall/exam-season`): *"Deadlines and steady pages · Silent. One topic per desk."*
-- **Night Owls** (`/hall/night-owls`): *"Late-night lamps · Silent. Be kind to tired eyes."*
+| Action | Control |
+| :--- | :--- |
+| **Orbit Overview (Default)** | Left-click + drag to rotate camera, Right-click to pan, Scroll to zoom |
+| **Walk Around Mode** | Click **"Walk around"** pill in top-left |
+| **Locomotion** | `W`, `A`, `S`, `D` or Arrow Keys |
+| **Sprint** | Hold `Shift` while moving |
+| **Inspect Shelf / Headphone Rack** | Aim crosshair at any bookcase or rack, then **Left-Click** or press **`E`** |
+| **Take a Seat** | Aim at any chair and **Left-Click** or press **`E`** |
+| **Exit Walk Mode** | Press `Esc` or click **"Exit walk"** |
+| **Toggle Rain Soundscape** | Click **"🌧 Rain: Off/On"** in the top header |
+| **2D Floor Plan** | Click **"Simple 2D View"** in the top header |
+| **Executive Wardrobe** | Click **"Wardrobe"** pill to customize suit, tie, and hair |
 
-### 2. Complete Desk & Focus Mechanics
-- **Take a Desk**: Set today's study topic, pick your rhythm (`25/5`, `50/10`, or `15/3` warm-up), and optionally mark it as your usual seat.
-- **Focus Timer**: Live countdown, animated progress bar, and digital clock.
-- **Synthesized Audio (Web Audio API)**:
-  - **Soft Chime**: Procedural dual-harmonic sine chime (C5 at 523.25 Hz & E5 at 659.25 Hz) when rounds complete.
-  - **Soft Rain**: Real-time brown noise procedural library murmur with low-pass filtering.
-- **Standing Up**: Log focused minutes and record an optional recap note for future you.
+---
 
-### 3. Interactive 3D Hall Engine (Three.js WebGL)
-- **Authentic Library Architecture**:
-  - Procedurally generated wood plank flooring with natural grain curves and green library carpet runners with gold decorative borders.
-  - Arched perimeter windows with starry night sky gradients and gentle rain streaks.
-  - Tall mahogany bookshelves filled with multi-colored scholarly volumes.
-  - Potted ficus plants in terracotta pots and brass wall lanterns with warm glowing globes.
-  - 24 numbered mahogany desks (`A1`–`D6`) equipped with emerald green banker's desk lamps, brass stems, and warm desktop light pools.
-- **Avatars & Presence**:
-  - Seated readers at occupied desks with study poses, notebooks, and lit lamps.
-  - Third-person walking avatar with WASD/arrow locomotion, speed toggle (Usual pace / Quicker), camera yaw/pitch drag, collision detection with tables and walls, and kneeling on a reading cushion (`G` key).
-  - Screen-projected 3D HTML floating tags (`.tag3d`) displaying avatar, name, topic, and weekly focus hours.
-  - Floating hover previews (`.hover3d`) for free and occupied desks with one-click sitting or profile interaction.
-  - In-scene 3D HUD overlay with digital focus clock, round controls (`Break`, `Notes`, `Hours`, `Timetable`), and camera zoom controls (`+` / `−`).
+## 📂 Architecture
 
-### 4. Productivity Suite
-- **Desk Notes**: Quick notes with source categorization (ChatGPT, Google, YouTube, Book, Other), URL attachments, 700ms debounced autosave, and shareable links.
-- **Study Hours Tracker**: Visual 7-day bar chart showing daily focus minutes with privacy controls.
-- **Timetable**: Weekly schedule planner organized by day, start/end time, and subject.
-- **Spotify Desk**: Embed your favorite study playlists or lofi tracks directly into your desk.
+```
+connect-cafe/
+├── index.html              # Main application shell & modal dialogs
+├── package.json            # Scripts and dependencies (Three.js, Vite)
+├── vite.config.js          # Vite build configuration
+├── src/
+│   ├── main.js             # App entry point & animation loop
+│   ├── scene.js            # Three.js scene, camera & ACESFilmic tone-mapped renderer
+│   ├── lighting.js         # Moody cafe lighting, pointlights & sconces
+│   ├── library.js          # Room architecture, espresso bar & central audio lounge
+│   ├── furniture.js        # 56 tables, 112 chairs, 88° laptops & formal avatars
+│   ├── books.js            # 22 locked glass bookcases & 6 3D headphone racks
+│   ├── audiobooks.js       # Curated audiobook library & runnable Audible/Amazon links
+│   ├── rain.js             # Arched windows with animated rain sliding droplets
+│   ├── controls.js         # OrbitControls & PointerLockControls walk mode
+│   ├── ui.js               # Modal dialogues, raycasting, and HUD interaction
+│   ├── audio.js            # Synthesized rain soundscape & focus chime
+│   ├── timer.js            # Study session state & local storage management
+│   └── style.css           # Responsive cafe theme & interactive crosshair styles
+```
 
-### 5. Multi-Tab & Real-Time Sync
-- Seamless cross-tab communication via `BroadcastChannel` (`hush-hall:${hallId}`) allowing live multiplayer across tabs/windows out of the box with zero server requirements.
-- Companion study presence: Gentle companions (`Aarav`, `Meera`, `Kabir`, `Isha`, `Rohan`, `Tara`, `Zoya`) are seeded deterministically per hall.
+---
 
-### 6. Full Route Pages
-- `/` – Library Lobby & Cards
-- `/hall/[id]` – The 4 Reading Halls (2D & 3D)
-- `/rules` – House Rules & Terms
-- `/privacy` – Privacy Policy
-- `/delete-account` – Complete Data Deletion Guide
-- `/me` – My Study Log, Stats, & Settings
-- `/signin` – Sign in with OTP Email Link
-- `/welcome` – 18+ Onboarding & Card Setup
-- `/mod` – Moderator Report Queue
+## 📜 License
+
+MIT License © Connect Cafe contributors.
+
 

@@ -1,7 +1,7 @@
 {
-  "name": "hush-hall",
+  "name": "connect-cafe",
   "version": "1.0.0",
-  "description": "Hush Hall · a quiet virtual library: take a desk, write your topic, study quietly next to others.",
+  "description": "Connect Cafe · a cozy 3D virtual library cafe: take a desk, write your topic, study quietly next to others.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "keywords": [
-    "hush-hall",
+    "connect-cafe",
     "virtual-library",
     "study-space",
     "focus",
     "pomodoro",
-    "minimalist"
+    "cafe"
   ],
   "author": "Chinmaye Mankatalia",
   "license": "MIT",

@@ -1,4 +1,4 @@
-// Hush Hall · Curated Audiobook Archive & Listening Salon
+// Connect Cafe · Curated Audiobook Archive & Listening Salon
 import { AMAZON_AFFILIATE_TAG } from './books.js';
 
 export function getAudiobookAffiliateLink(title, author, affiliateTag = AMAZON_AFFILIATE_TAG) {

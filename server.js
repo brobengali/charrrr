@@ -133,6 +133,6 @@ function serveFile(filePath, res) {
 }
 
 server.listen(PORT, () => {
-  console.log(`\n  Hush Hall · a quiet virtual library`);
+  console.log(`\n  Connect Cafe · a cozy 3D virtual library cafe`);
   console.log(`  > Local:   http://localhost:${PORT}/\n`);
 });

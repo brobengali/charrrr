@@ -1,4 +1,4 @@
-// Hush Hall · Web Audio Soundscapes & Chimes (Pure JS, no external audio files)
+// Connect Cafe · Web Audio Soundscapes & Chimes (Pure JS, no external audio files)
 
 let audioCtx = null;
 let rainSource = null;

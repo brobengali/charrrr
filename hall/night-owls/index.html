@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="theme-color" content="#f6efe2"/>
-  <title>Night Owls · Hush Hall</title>
+  <title>Night Owls · Connect Cafe</title>
   <meta name="description" content="Take a desk, write your topic, study quietly next to others."/>
   <link rel="stylesheet" href="/style.css"/>
   <link rel="manifest" href="/manifest.webmanifest"/>
@@ -13,8 +13,8 @@
 <body>
   <div class="hall-root">
     <header class="topbar">
-      <a href="/" class="brand">Hush Hall</a>
-      <span class="tagline">a quiet virtual library</span>
+      <a href="/" class="brand">Connect Cafe</a>
+      <span class="tagline">a cozy virtual library cafe</span>
     </header>
 
     <main>
@@ -270,12 +270,14 @@
     // Boot Hall after DOM + scripts are ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function () {
-        if (window.initHushHall) window.initHushHall("night-owls");
-        else console.error('[HushHall] initHushHall not found. Check /hall-runtime.js is served.');
+        const boot = window.initConnectCafe || window.initHushHall;
+        if (boot) boot("night-owls");
+        else console.error('[ConnectCafe] initConnectCafe not found. Check /hall-runtime.js is served.');
       });
     } else {
-      if (window.initHushHall) window.initHushHall("night-owls");
-      else console.error('[HushHall] initHushHall not found. Check /hall-runtime.js is served.');
+      const boot = window.initConnectCafe || window.initHushHall;
+      if (boot) boot("night-owls");
+      else console.error('[ConnectCafe] initConnectCafe not found. Check /hall-runtime.js is served.');
     }
   </script>
 </body>

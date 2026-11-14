@@ -1,5 +1,5 @@
 /**
- * Hush Hall · Complete Client Runtime
+ * Connect Cafe · Complete Client Runtime
  * Authentic standalone implementation: 2D floor, focus timer, Web Audio chimes & rain,
  * notes, hours chart, timetable, Spotify embed, multi-tab sync, and 3D hall.
  */
@@ -235,7 +235,7 @@
     // Multi-tab BroadcastChannel
     let broadcast = null;
     try {
-      broadcast = new BroadcastChannel(`hush-hall:${hallId}`);
+      broadcast = new BroadcastChannel(`connect-cafe:${hallId}`);
       broadcast.onmessage = (e) => {
         const msg = e.data;
         if (!msg) return;
@@ -1259,5 +1259,6 @@
     applyView();
   }
 
+  global.initConnectCafe = initHall;
   global.initHushHall = initHall;
 })(window);

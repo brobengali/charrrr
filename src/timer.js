@@ -1,4 +1,4 @@
-// Hush Hall · Focus Timer & Study Session State
+// Connect Cafe · Focus Timer & Study Session State
 
 const STORAGE_KEYS = {
   PROFILE: 'hh.profile',

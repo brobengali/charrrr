@@ -251,9 +251,35 @@ export function buildLibraryRoom(scene) {
   menuBoard.position.set(barX, 3.8, ROOM.minZ + 0.2);
   barGroup.add(menuBoard);
 
-  // Cafe Name Plaque in Brass
-  const plaque = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.35, 0.03), brassMat);
-  plaque.position.set(barX, 4.85, ROOM.minZ + 0.2);
+  // Cafe Name Plaque in Brass with "☕ CONNECT CAFE ☕"
+  const plaqueCanvas = document.createElement('canvas');
+  plaqueCanvas.width = 1024;
+  plaqueCanvas.height = 256;
+  const pCtx = plaqueCanvas.getContext('2d');
+  pCtx.fillStyle = '#1c150e';
+  pCtx.fillRect(0, 0, 1024, 256);
+  pCtx.strokeStyle = '#deb358';
+  pCtx.lineWidth = 12;
+  pCtx.strokeRect(16, 16, 992, 224);
+  pCtx.strokeStyle = '#ffd782';
+  pCtx.lineWidth = 4;
+  pCtx.strokeRect(28, 28, 968, 200);
+  pCtx.fillStyle = '#ffdf99';
+  pCtx.font = 'bold 64px Georgia, serif';
+  pCtx.textAlign = 'center';
+  pCtx.textBaseline = 'middle';
+  pCtx.fillText('☕ CONNECT CAFE ☕', 512, 128);
+
+  const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
+  plaqueTex.colorSpace = THREE.SRGBColorSpace;
+  const plaqueMat = new THREE.MeshStandardMaterial({
+    map: plaqueTex,
+    roughness: 0.35,
+    metalness: 0.65,
+    flatShading: true
+  });
+  const plaque = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.65, 0.04), plaqueMat);
+  plaque.position.set(barX, 4.88, ROOM.minZ + 0.22);
   barGroup.add(plaque);
 
   // Hanging Pendant Lights over Espresso Bar
